@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Candidate Bench — BasMan Technology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#A01A25; --red-dark:#7E141D; --gray:#55555A; --gray-2:#66666B;
+  --text:#1F1E1E; --muted:#55514F; --line:#ECE7E5; --soft:#F7F4F3; --white:#FFFFFF; --green:#1F8F4E;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5}
+a{color:var(--red)}
+h1,h2,h3{font-family:'Outfit',sans-serif;font-weight:600;color:var(--gray);margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.eyebrow{margin:0 0 6px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;border:0;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover:not(:disabled){background:var(--red-dark)}
+.btn-gray{background:var(--gray);color:#fff}.btn-gray:hover:not(:disabled){background:#45454A}
+.btn-outline{background:#fff;color:var(--gray);border:1px solid #CFC8C5}.btn-outline:hover{border-color:var(--gray)}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#18733E}
+
+/* Header */
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:40px;height:40px;border-radius:9px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:500;font-size:18px}
+.logo-name{font-family:'Outfit',sans-serif;font-weight:500;font-size:22px;color:var(--gray)}
+.logo-name span{color:var(--red)}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Toolbar */
+.top{padding:28px 0 16px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.top h1{font-size:32px}
+.top p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.toolbar input,.toolbar select{font:inherit;font-size:14px;border:1px solid #CFC8C5;border-radius:8px;padding:9px 12px;background:#fff;color:var(--text)}
+.toolbar input[type=search]{flex:1 1 260px;min-width:0}
+.toolbar .count{margin-left:auto;font-size:13px;color:var(--muted)}
+
+/* Selection bar */
+.selbar{display:none;position:sticky;top:66px;z-index:9;margin-top:12px;background:var(--gray);color:#fff;border-radius:12px;padding:10px 14px;align-items:center;gap:10px;flex-wrap:wrap}
+.selbar.show{display:flex}
+.selbar span{font-weight:600;margin-right:auto}
+
+/* Cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:16px;padding:16px 0 80px}
+.cand{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;position:relative}
+.cand.sel{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.cand-top{display:flex;gap:12px;align-items:flex-start}
+.cand-top input[type=checkbox]{width:18px;height:18px;margin-top:4px;accent-color:var(--red);flex:none;cursor:pointer}
+.cand h3{font-size:20px;line-height:1.2}
+.cand .title{color:var(--red);font-weight:500;font-size:14px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted)}
+.meta a{color:var(--muted);text-decoration:none}.meta a:hover{color:var(--red)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--soft);border:1px solid var(--line);color:var(--gray);border-radius:6px;padding:2px 8px}
+.tag.hit{background:#FBEFF0;border-color:#E9B9BD;color:var(--red-dark)}
+.exp{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--gray);color:#fff;border-radius:6px;padding:3px 8px;white-space:nowrap;margin-left:auto}
+.notes{font-size:13px;color:var(--muted);margin:0;white-space:pre-wrap}
+.resume-line{font-size:13px;display:flex;align-items:center;gap:6px}
+.resume-line.none{color:#B0563F}
+.cand-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;background:#fff;border:1px dashed #D9D2CF;border-radius:14px;color:var(--muted)}
+.empty h2{font-size:24px;margin-bottom:8px}
+
+/* Dialogs */
+dialog{border:0;border-radius:16px;padding:0;width:min(640px,94vw);max-height:92vh;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(31,30,30,.5)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:22px}
+.x{background:none;border:0;font-size:26px;line-height:1;cursor:pointer;color:var(--gray)}
+.dlg-body{padding:20px 24px;overflow:auto;max-height:calc(92vh - 150px)}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 24px;border-top:1px solid var(--line);flex-wrap:wrap}
+form.f{display:flex;flex-direction:column;gap:14px}
+.f label{display:block;font-size:13px;font-weight:500;color:var(--gray)}
+.f input,.f textarea,.f select{font:inherit;font-size:15px;border:1px solid #CFC8C5;border-radius:8px;padding:10px 12px;background:#fff;color:var(--text);width:100%}
+.f textarea{resize:vertical;min-height:70px}
+.f select{min-height:44px}
+.f input:focus,.f textarea:focus,.f select:focus{outline:2px solid var(--red);outline-offset:1px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.hint{font-weight:400;color:#7A7A80;font-size:12px}
+.req{color:var(--red)}
+.current-file{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+.f label > input,.f label > select,.f label > textarea{display:block;margin-top:5px}
+
+.opt{display:flex;align-items:center;gap:8px;font-size:14px;margin:0 0 12px;cursor:pointer}
+.opt input{width:17px;height:17px;accent-color:var(--red)}
+.preview{width:100%;min-height:240px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.5;border:1px solid #CFC8C5;border-radius:8px;padding:12px;background:var(--soft);color:var(--text);resize:vertical}
+.share-note{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:100;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:640px){
+  .wrap{padding:0 14px}
+  header{position:static}
+  .head{padding:10px 14px;gap:10px}
+  .head-actions{width:100%}
+  .head-actions .btn-red{flex:1 1 100%;order:-1}
+  .head-actions .btn-sm{flex:1 1 auto}
+  .top{padding:18px 0 10px}
+  .top h1{font-size:26px}
+  .toolbar{padding:10px;gap:8px}
+  .toolbar input[type=search]{flex:1 1 100%;font-size:16px}
+  .toolbar select{flex:1 1 40%;font-size:16px}
+  .toolbar .count{margin-left:0;width:100%}
+  #selAllBtn{flex:1 1 100%}
+  .selbar{top:8px}
+  .cand{padding:16px}
+  .cand-actions .btn{flex:1 1 auto}
+  .cand-actions .btn[data-act=del]{margin-left:0!important}
+  dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0}
+  .dlg-body{max-height:none;flex:1}
+  dialog[open]{display:flex;flex-direction:column}
+  dialog form.f{display:flex;flex-direction:column;height:100%}
+  .dlg-head,.dlg-body,.dlg-foot{padding-left:16px;padding-right:16px}
+  .dlg-foot .btn{flex:1 1 45%}
+  .f input,.f textarea,.f select{font-size:16px}
+}
+.privacy{font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;padding:10px 14px;margin:0 0 4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">BM</div>
+      <div class="logo-name">Bas<span>Man</span></div>
+    </a>
+    <div class="head-actions">
+      <button class="btn btn-outline btn-sm" id="syncBtn" title="Import new applicants from your Google Drive">☁ Sync applicants</button>
+      <button class="btn btn-outline btn-sm" id="syncSetBtn" title="Google Drive sync settings" aria-label="Sync settings">⚙</button>
+      <button class="btn btn-outline btn-sm" id="exportBtn" title="Download a backup file of all candidates and resumes">⬇ Backup</button>
+      <label class="btn btn-outline btn-sm" title="Restore candidates from a backup file">⬆ Restore<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+      <button class="btn btn-red" id="addBtn">+ Add candidate</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="top">
+    <div>
+      <p class="eyebrow">Private · Talent bench</p>
+      <h1>Candidate profiles</h1>
+      <p>Store candidates once, then send matching profiles to vendors in a click.</p>
+    </div>
+  </div>
+
+  <p class="privacy">🔒 Profiles and resumes are saved <b>only in this browser on this device</b> — nothing is uploaded to the website. Use <b>Backup</b> regularly and <b>Restore</b> to move them to another computer.</p>
+
+  <div class="toolbar" style="margin-top:12px">
+    <input type="search" id="q" placeholder="Search name, title, skills or location — e.g. “UiPath, Kuwait”" aria-label="Search candidates">
+    <select id="minExp" aria-label="Experience">
+      <option value="">Any experience</option>
+      <option value="0-1">Fresher (0–1 yr)</option>
+      <option value="1-3">1–3 yrs</option>
+      <option value="4-6">4–6 yrs</option>
+      <option value="7-9">7–9 yrs</option>
+      <option value="10-14">10–14 yrs</option>
+      <option value="15+">15–20+ yrs</option>
+    </select>
+    <select id="sort" aria-label="Sort">
+      <option value="new">Newest first</option>
+      <option value="name">Name A–Z</option>
+      <option value="exp">Most experience</option>
+    </select>
+    <button class="btn btn-outline btn-sm" id="selAllBtn">Select all shown</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="selbar" id="selbar">
+    <span id="selCount">0 selected</span>
+    <button class="btn btn-green btn-sm" id="sendSelBtn">✉ Send to vendor</button>
+    <button class="btn btn-outline btn-sm" id="clearSelBtn">Clear</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- Add / edit dialog -->
+<dialog id="editDlg">
+  <form class="f" id="editForm" method="dialog">
+    <div class="dlg-head"><h2 id="editTitle">Add candidate</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dlg-body">
+      <div class="f" style="gap:14px">
+        <div class="row2">
+          <label>Full name <span class="req">*</span><input name="name" required></label>
+          <label>Job title <span class="req">*</span><input name="title" required placeholder="e.g. RPA Developer"></label>
+        </div>
+        <div class="row2">
+          <label>Email<input name="email" type="email"></label>
+          <label>Phone<input name="phone" type="tel" placeholder="+965 …"></label>
+        </div>
+        <div class="row2">
+          <label>Total experience <span class="req">*</span><select name="experience" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0-1">Fresher (0–1 yr)</option>
+            <option value="1-3">1–3 years</option>
+            <option value="4-6">4–6 years</option>
+            <option value="7-9">7–9 years</option>
+            <option value="10-14">10–14 years</option>
+            <option value="15+">15–20+ years</option>
+          </select></label>
+          <label>LinkedIn URL<input name="linkedin" type="text" inputmode="url" autocapitalize="off" placeholder="https://www.linkedin.com/in/…"></label>
+        </div>
+        <label>Address / current location<input name="address" placeholder="Area, City, Country"></label>
+        <label>Skills <span class="hint">— separate with commas</span><input name="skills" placeholder="UiPath, Python, SQL, Power Automate"></label>
+        <label>Resume <span class="hint">— PDF or Word, kept with the profile</span>
+          <input name="resume" type="file" accept=".pdf,.doc,.docx,.rtf,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+          <span class="current-file" id="currentFile"></span>
+        </label>
+        <label>Notes <span class="hint">— notice period, location, expected salary, etc.</span><textarea name="notes" rows="3"></textarea></label>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-outline" data-close>Cancel</button>
+      <button type="submit" class="btn btn-red" id="saveBtn">Save candidate</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Send dialog -->
+<dialog id="sendDlg">
+  <div class="dlg-head"><h2 id="sendTitle">Send to vendor</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <label class="opt"><input type="checkbox" id="incContact"> Include candidate's email &amp; phone</label>
+    <textarea class="preview" id="sendText" aria-label="Message preview (you can edit it)"></textarea>
+    <p class="share-note" id="shareNote"></p>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn btn-outline" id="copyBtn">Copy text</button>
+    <button class="btn btn-outline" id="dlResumesBtn">Download resume(s)</button>
+    <button class="btn btn-outline" id="mailBtn">Open in email</button>
+    <button class="btn btn-green" id="shareBtn">Share with resume(s)</button>
+  </div>
+</dialog>
+
+<!-- Sync settings dialog -->
+<dialog id="syncDlg">
+  <form class="f" id="syncForm" method="dialog">
+    <div class="dlg-head"><h2>Google Drive sync</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dlg-body">
+      <div class="f" style="gap:14px">
+        <p style="margin:0;font-size:14px;color:var(--muted)">Imports new applicants (and their resumes) from the Careers form. These two values are saved only in this browser — they are never put in the website code.</p>
+        <label>Apps Script Web app URL <span class="req">*</span><input name="url" type="url" required placeholder="https://script.google.com/macros/s/…/exec"></label>
+        <label>Admin key <span class="req">*</span> <span class="hint">— from the setup() log</span><input name="key" type="password" required autocomplete="off"></label>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-outline" id="syncForget">Forget on this device</button>
+      <button type="submit" class="btn btn-red">Save &amp; sync now</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  // ===== Storage (IndexedDB — holds profiles and resume files in this browser) =====
+  var DB_NAME = 'basman-candidates', STORE = 'candidates', db;
+
+  function openDB() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function () {
+        if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE, { keyPath: 'id' });
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+  function tx(mode, fn) {
+    return new Promise(function (resolve, reject) {
+      var t = db.transaction(STORE, mode), s = t.objectStore(STORE), out = fn(s);
+      t.oncomplete = function () { resolve(out && out.result !== undefined ? out.result : out); };
+      t.onerror = function () { reject(t.error); };
+    });
+  }
+  var getAll = function () { return tx('readonly', function (s) { return s.getAll(); }); };
+  var put = function (c) { return tx('readwrite', function (s) { s.put(c); }); };
+  var del = function (id) { return tx('readwrite', function (s) { s.delete(id); }); };
+
+  // ===== State =====
+  var all = [], selected = new Set(), editingId = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function splitSkills(s) { return String(s || '').split(/[,;\n]+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  var EXP_ORDER = ['0-1', '1-3', '4-6', '7-9', '10-14', '15+'];
+  var EXP_LABEL = { '0-1': 'Fresher', '1-3': '1–3 yrs', '4-6': '4–6 yrs', '7-9': '7–9 yrs', '10-14': '10–14 yrs', '15+': '15–20+ yrs' };
+  // Accepts a range ("4-6") or an old number (5) and returns the range key
+  function expRange(v) {
+    v = String(v == null ? '' : v).trim();
+    if (EXP_LABEL[v]) return v;
+    var n = parseFloat(v); if (isNaN(n)) return '';
+    return n < 1 ? '0-1' : n <= 3 ? '1-3' : n <= 6 ? '4-6' : n <= 9 ? '7-9' : n <= 14 ? '10-14' : '15+';
+  }
+  function yrs(v) { var r = expRange(v); return r ? EXP_LABEL[r] : '—'; }
+  function expFull(v) { var r = expRange(v); return r === '0-1' ? 'Fresher (0–1 year)' : r === '15+' ? '15–20+ years' : r ? r.replace('-', '–') + ' years' : 'Not specified'; }
+  function safeUrl(u) { u = String(u || '').trim(); if (!u) return ''; if (!/^https?:\/\//i.test(u)) u = 'https://' + u; return u; }
+  function fmtSize(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2600); }
+
+  // ===== Render =====
+  function terms() { return $('q').value.toLowerCase().split(/[,\s]+/).filter(Boolean); }
+
+  function filtered() {
+    var t = terms(), want = $('minExp').value, sort = $('sort').value;
+    var list = all.filter(function (c) {
+      if (want && expRange(c.experience) !== want) return false;
+      if (!t.length) return true;
+      var hay = (c.name + ' ' + c.title + ' ' + c.skills.join(' ') + ' ' + (c.address || '') + ' ' + (c.notes || '')).toLowerCase();
+      return t.every(function (w) { return hay.indexOf(w) !== -1; });
+    });
+    list.sort(function (a, b) {
+      if (sort === 'name') return a.name.localeCompare(b.name);
+      if (sort === 'exp') return EXP_ORDER.indexOf(expRange(b.experience)) - EXP_ORDER.indexOf(expRange(a.experience));
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
+    return list;
+  }
+
+  function render() {
+    var list = filtered(), t = terms(), g = $('grid');
+    $('count').textContent = list.length + ' of ' + all.length + ' candidate' + (all.length === 1 ? '' : 's');
+
+    if (!all.length) {
+      g.innerHTML = '<div class="empty"><h2>No candidates yet</h2><p>Add your first profile — name, title, experience, skills, contact details and resume.</p><button class="btn btn-red" onclick="document.getElementById(\'addBtn\').click()">+ Add candidate</button></div>';
+    } else if (!list.length) {
+      g.innerHTML = '<div class="empty"><h2>No matches</h2><p>Try fewer skills or a different experience range.</p></div>';
+    } else {
+      g.innerHTML = list.map(function (c) {
+        var tags = c.skills.map(function (s) {
+          var hit = t.some(function (w) { return s.toLowerCase().indexOf(w) !== -1; });
+          return '<span class="tag' + (hit ? ' hit' : '') + '">' + esc(s) + '</span>';
+        }).join('');
+        var contact = [];
+        if (c.email) contact.push('<a href="mailto:' + esc(c.email) + '">✉ ' + esc(c.email) + '</a>');
+        if (c.phone) contact.push('<a href="tel:' + esc(c.phone.replace(/\s/g, '')) + '">☏ ' + esc(c.phone) + '</a>');
+        if (c.linkedin) contact.push('<a href="' + esc(safeUrl(c.linkedin)) + '" target="_blank" rel="noopener">in LinkedIn</a>');
+        if (c.address) contact.push('<span>📍 ' + esc(c.address) + '</span>');
+        var resume = c.resume
+          ? '<div class="resume-line">📄 <a href="#" data-act="view" data-id="' + c.id + '">' + esc(c.resume.name) + '</a> <span style="color:#7A7A80">(' + fmtSize(c.resume.blob.size) + ')</span></div>'
+          : '<div class="resume-line none">⚠ No resume attached</div>';
+        return '<article class="cand' + (selected.has(c.id) ? ' sel' : '') + '">' +
+          '<div class="cand-top"><input type="checkbox" data-act="sel" data-id="' + c.id + '"' + (selected.has(c.id) ? ' checked' : '') + ' aria-label="Select ' + esc(c.name) + '">' +
+          '<div style="min-width:0;flex:1"><h3>' + esc(c.name) + '</h3><div class="title">' + esc(c.title) + '</div></div>' +
+          '<span class="exp">' + yrs(c.experience) + '</span></div>' +
+          (contact.length ? '<div class="meta">' + contact.join('') + '</div>' : '') +
+          (tags ? '<div class="tags">' + tags + '</div>' : '') +
+          (c.notes ? '<p class="notes">' + esc(c.notes) + '</p>' : '') +
+          resume +
+          '<div class="cand-actions">' +
+            '<button class="btn btn-green btn-sm" data-act="send" data-id="' + c.id + '">✉ Send</button>' +
+            '<button class="btn btn-outline btn-sm" data-act="edit" data-id="' + c.id + '">Edit</button>' +
+            (c.resume ? '<button class="btn btn-outline btn-sm" data-act="dl" data-id="' + c.id + '">⬇ Resume</button>' : '') +
+            '<button class="btn btn-outline btn-sm" data-act="del" data-id="' + c.id + '" style="margin-left:auto;color:var(--red)">Delete</button>' +
+          '</div></article>';
+      }).join('');
+    }
+    updateSelbar();
+  }
+
+  function updateSelbar() {
+    selected.forEach(function (id) { if (!all.some(function (c) { return c.id === id; })) selected.delete(id); });
+    $('selCount').textContent = selected.size + ' selected';
+    $('selbar').classList.toggle('show', selected.size > 0);
+  }
+
+  function byId(id) { return all.find(function (c) { return c.id === id; }); }
+
+  async function reload() { all = await getAll(); render(); }
+
+  // ===== Add / edit =====
+  var editDlg = $('editDlg'), form = $('editForm');
+  function F(n) { return form.elements.namedItem(n); }
+
+  function openEdit(c) {
+    editingId = c ? c.id : null;
+    form.reset();
+    $('editTitle').textContent = c ? 'Edit candidate' : 'Add candidate';
+    if (c) {
+      F('name').value = c.name; F('title').value = c.title; F('email').value = c.email || '';
+      F('phone').value = c.phone || ''; F('experience').value = c.experience; F('skills').value = c.skills.join(', ');
+      F('notes').value = c.notes || '';
+      F('experience').value = expRange(c.experience); F('linkedin').value = c.linkedin || ''; F('address').value = c.address || '';
+    }
+    $('currentFile').textContent = c && c.resume ? 'Current: ' + c.resume.name + ' — choose a new file only to replace it.' : '';
+    editDlg.showModal();
+    F('name').focus();
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var old = editingId ? byId(editingId) : null;
+    var file = F('resume').files[0];
+    if (file && file.size > 15 * 1048576) { toast('Resume is larger than 15 MB — please use a smaller file.'); return; }
+    var c = {
+      id: old ? old.id : uid(),
+      name: F('name').value.trim(),
+      title: F('title').value.trim(),
+      email: F('email').value.trim(),
+      phone: F('phone').value.trim(),
+      experience: F('experience').value,
+      linkedin: safeUrl(F('linkedin').value),
+      address: F('address').value.trim(),
+      skills: splitSkills(F('skills').value),
+      notes: F('notes').value.trim(),
+      resume: file ? { name: file.name, type: file.type || 'application/octet-stream', blob: file } : (old ? old.resume : null),
+      createdAt: old ? old.createdAt : Date.now(),
+      updatedAt: Date.now()
+    };
+    try {
+      await put(c);
+      editDlg.close();
+      toast(old ? 'Profile updated' : 'Candidate saved');
+      reload();
+    } catch (err) {
+      toast('Could not save: ' + (err && err.message || err));
+    }
+  });
+
+  // ===== Files =====
+  function download(blob, name) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }
+  function resumeName(c) {
+    var ext = (c.resume.name.match(/\.[a-z0-9]+$/i) || [''])[0];
+    return c.name.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '_') + '_Resume' + ext;
+  }
+  function resumeFile(c) { return new File([c.resume.blob], resumeName(c), { type: c.resume.type }); }
+
+  // ===== Send to vendor =====
+  var sendDlg = $('sendDlg'), sending = [];
+
+  function profileText(c, contact) {
+    var lines = [
+      'Name: ' + c.name,
+      'Title: ' + c.title,
+      'Experience: ' + expFull(c.experience)
+    ];
+    if (c.skills.length) lines.push('Skills: ' + c.skills.join(', '));
+    if (contact && c.email) lines.push('Email: ' + c.email);
+    if (contact && c.phone) lines.push('Phone: ' + c.phone);
+    if (c.linkedin) lines.push('LinkedIn: ' + safeUrl(c.linkedin));
+    if (c.address) lines.push('Location: ' + c.address);
+    if (c.notes) lines.push('Notes: ' + c.notes);
+    lines.push('Resume: ' + (c.resume ? 'attached (' + resumeName(c) + ')' : 'available on request'));
+    return lines.join('\n');
+  }
+
+  function buildMessage() {
+    var contact = $('incContact').checked;
+    var intro = sending.length === 1
+      ? 'Hello,\n\nPlease find below the profile of a candidate for your requirement.\n\n'
+      : 'Hello,\n\nPlease find below ' + sending.length + ' candidate profiles for your requirement.\n\n';
+    var body = sending.map(function (c, i) {
+      return (sending.length > 1 ? (i + 1) + ') ' : '') + profileText(c, contact).replace(/\n/g, '\n' + (sending.length > 1 ? '   ' : ''));
+    }).join('\n\n');
+    return intro + body + '\n\nRegards,\nBasMan Technology Private Limited\nbasmantechnology@gmail.com | +965 6586 1821';
+  }
+
+  function openSend(list) {
+    sending = list;
+    $('sendTitle').textContent = list.length === 1 ? 'Send ' + list[0].name + ' to vendor' : 'Send ' + list.length + ' profiles to vendor';
+    $('sendText').value = buildMessage();
+    var withResume = list.filter(function (c) { return c.resume; }).length;
+    var canShareFiles = !!(navigator.canShare && withResume && navigator.canShare({ files: [resumeFile(list.find(function (c) { return c.resume; }))] }));
+    $('shareBtn').style.display = canShareFiles ? '' : 'none';
+    $('dlResumesBtn').disabled = !withResume;
+    $('shareNote').textContent = canShareFiles
+      ? '“Share with resume(s)” sends the text and resume files together through WhatsApp, Gmail, Outlook, etc.'
+      : (withResume
+          ? 'Tip: click “Download resume(s)”, then “Open in email” and attach the downloaded file(s) to the email.'
+          : 'No resumes attached to the selected profile(s) — the message says “available on request”.');
+    sendDlg.showModal();
+  }
+
+  $('incContact').addEventListener('change', function () { $('sendText').value = buildMessage(); });
+
+  $('copyBtn').addEventListener('click', function () {
+    navigator.clipboard.writeText($('sendText').value).then(function () { toast('Message copied'); }, function () {
+      $('sendText').select(); document.execCommand('copy'); toast('Message copied');
+    });
+  });
+  $('dlResumesBtn').addEventListener('click', function () {
+    var n = 0;
+    sending.forEach(function (c, i) { if (c.resume) { n++; setTimeout(function () { download(c.resume.blob, resumeName(c)); }, i * 350); } });
+    toast(n + ' resume' + (n === 1 ? '' : 's') + ' downloading');
+  });
+  $('mailBtn').addEventListener('click', function () {
+    var subj = sending.length === 1 ? 'Candidate profile: ' + sending[0].name + ' — ' + sending[0].title : sending.length + ' candidate profiles — BasMan Technology';
+    location.href = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent($('sendText').value);
+  });
+  $('shareBtn').addEventListener('click', function () {
+    var files = sending.filter(function (c) { return c.resume; }).map(resumeFile);
+    navigator.share({ title: 'Candidate profiles', text: $('sendText').value, files: files })
+      .catch(function (err) { if (err && err.name !== 'AbortError') toast('Sharing failed — use Download + Open in email instead.'); });
+  });
+
+  // ===== Backup / restore =====
+  function blobToDataURL(b) { return new Promise(function (r) { var fr = new FileReader(); fr.onload = function () { r(fr.result); }; fr.readAsDataURL(b); }); }
+  async function dataURLToBlob(u) { return (await fetch(u)).blob(); }
+
+  $('exportBtn').addEventListener('click', async function () {
+    if (!all.length) { toast('Nothing to back up yet'); return; }
+    var out = [];
+    for (var i = 0; i < all.length; i++) {
+      var c = Object.assign({}, all[i]);
+      if (c.resume) c.resume = { name: c.resume.name, type: c.resume.type, data: await blobToDataURL(c.resume.blob) };
+      out.push(c);
+    }
+    var stamp = new Date().toISOString().slice(0, 10);
+    download(new Blob([JSON.stringify({ app: 'basman-candidates', version: 1, exportedAt: new Date().toISOString(), candidates: out })], { type: 'application/json' }),
+             'basman-candidates-backup-' + stamp + '.json');
+    toast('Backup downloaded — keep it somewhere safe');
+  });
+
+  $('importFile').addEventListener('change', async function (e) {
+    var f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try {
+      var data = JSON.parse(await f.text());
+      var list = data && data.candidates;
+      if (!Array.isArray(list)) throw new Error('not a candidate backup file');
+      var added = 0, updated = 0;
+      for (var i = 0; i < list.length; i++) {
+        var c = list[i];
+        if (!c || !c.id || !c.name) continue;
+        if (c.resume && c.resume.data) c.resume = { name: c.resume.name, type: c.resume.type, blob: await dataURLToBlob(c.resume.data) };
+        c.skills = Array.isArray(c.skills) ? c.skills : splitSkills(c.skills);
+        if (byId(c.id)) updated++; else added++;
+        await put(c);
+      }
+      await reload();
+      toast('Restored: ' + added + ' added, ' + updated + ' updated');
+    } catch (err) {
+      toast('Restore failed — ' + (err && err.message || 'invalid file'));
+    }
+  });
+
+  // ===== Google Drive sync (applicants from the Careers form) =====
+  var SYNC_KEY = 'basman-sync';
+  var DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwKHx_ieSwA9DBBqPCjldYo-uZ0EQdyVBHVdkxzs_7DR3G0AFkN11mCSeZun1ilolOa/exec';
+  var syncDlg = $('syncDlg'), syncForm = $('syncForm');
+  function getSync() { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch (e) { return null; } }
+  function setSync(v) { try { v ? localStorage.setItem(SYNC_KEY, JSON.stringify(v)) : localStorage.removeItem(SYNC_KEY); } catch (e) {} }
+  function api(cfg, params) {
+    var q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+    return fetch(cfg.url + (cfg.url.indexOf('?') === -1 ? '?' : '&') + 'key=' + encodeURIComponent(cfg.key) + '&' + q)
+      .then(function (r) { return r.json(); })
+      .then(function (res) { if (!res || !res.ok) throw new Error(res && res.error === 'unauthorized' ? 'wrong admin key' : (res && res.error) || 'bad response'); return res; });
+  }
+
+  async function runSync(cfg) {
+    var btn = $('syncBtn'), label = btn.textContent;
+    btn.disabled = true; btn.textContent = '☁ Syncing…';
+    try {
+      var res = await api(cfg, { action: 'list' });
+      var fresh = res.candidates.filter(function (a) { return !byId('web-' + a.id); });
+      for (var i = 0; i < fresh.length; i++) {
+        var a = fresh[i], resume = null;
+        btn.textContent = '☁ ' + (i + 1) + ' / ' + fresh.length;
+        if (a.resumeId) {
+          try {
+            var f = await api(cfg, { action: 'file', id: a.resumeId });
+            resume = { name: f.name, type: f.type, blob: await (await fetch('data:' + f.type + ';base64,' + f.data)).blob() };
+          } catch (e) { console.warn('Resume download failed for', a.name, e); }
+        }
+        var notes = ['Applied for: ' + a.role + ' (website, ' + new Date(a.submitted).toLocaleDateString() + ')'];
+        if (a.message) notes.push(a.message);
+        if (a.resumeId && !resume && a.resumeUrl) notes.push('Resume in Drive: ' + a.resumeUrl);
+        await put({
+          id: 'web-' + a.id, name: a.name, title: a.title, email: a.email, phone: a.phone,
+          experience: expRange(a.experience), linkedin: safeUrl(a.linkedin), address: a.address || '',
+          skills: splitSkills(a.skills), notes: notes.join('\n'),
+          resume: resume, createdAt: a.submitted || Date.now(), updatedAt: a.submitted || Date.now(), source: 'website'
+        });
+      }
+      await reload();
+      toast(fresh.length ? fresh.length + ' new applicant' + (fresh.length === 1 ? '' : 's') + ' imported' : 'Up to date — no new applicants');
+    } catch (err) {
+      toast('Sync failed — ' + (err && err.message || err));
+      if (/admin key/.test(String(err && err.message))) openSyncSettings();
+    } finally {
+      btn.disabled = false; btn.textContent = label;
+    }
+  }
+
+  function openSyncSettings() {
+    var cfg = getSync() || {};
+    syncForm.elements.namedItem('url').value = cfg.url || DEFAULT_SYNC_URL;
+    syncForm.elements.namedItem('key').value = cfg.key || '';
+    syncDlg.showModal();
+  }
+  $('syncBtn').addEventListener('click', function () { var cfg = getSync(); cfg ? runSync(cfg) : openSyncSettings(); });
+  $('syncSetBtn').addEventListener('click', openSyncSettings);
+  syncForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var cfg = { url: syncForm.elements.namedItem('url').value.trim(), key: syncForm.elements.namedItem('key').value.trim() };
+    setSync(cfg); syncDlg.close(); runSync(cfg);
+  });
+  $('syncForget').addEventListener('click', function () { setSync(null); syncDlg.close(); toast('Sync settings removed from this device'); });
+
+  // ===== Events =====
+  $('addBtn').addEventListener('click', function () { openEdit(null); });
+  ['q', 'minExp', 'sort'].forEach(function (id) { $(id).addEventListener('input', render); });
+  $('selAllBtn').addEventListener('click', function () { filtered().forEach(function (c) { selected.add(c.id); }); render(); });
+  $('clearSelBtn').addEventListener('click', function () { selected.clear(); render(); });
+  $('sendSelBtn').addEventListener('click', function () {
+    openSend(all.filter(function (c) { return selected.has(c.id); }));
+  });
+
+  $('grid').addEventListener('click', async function (e) {
+    var el = e.target.closest('[data-act]'); if (!el) return;
+    var c = byId(el.dataset.id), act = el.dataset.act;
+    if (!c) return;
+    if (act === 'sel') { el.checked ? selected.add(c.id) : selected.delete(c.id); el.closest('.cand').classList.toggle('sel', el.checked); updateSelbar(); return; }
+    e.preventDefault();
+    if (act === 'edit') openEdit(c);
+    else if (act === 'send') openSend([c]);
+    else if (act === 'dl') download(c.resume.blob, resumeName(c));
+    else if (act === 'view') { var url = URL.createObjectURL(c.resume.blob); window.open(url, '_blank'); setTimeout(function () { URL.revokeObjectURL(url); }, 60000); }
+    else if (act === 'del') {
+      if (!confirm('Delete ' + c.name + '\'s profile and resume? This cannot be undone.')) return;
+      await del(c.id); selected.delete(c.id); toast('Profile deleted'); reload();
+    }
+  });
+
+  document.querySelectorAll('[data-close]').forEach(function (b) {
+    b.addEventListener('click', function () { b.closest('dialog').close(); });
+  });
+
+  // ===== Start =====
+  openDB().then(function (d) {
+    db = d;
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+    return reload();
+  }).catch(function (err) {
+    $('grid').innerHTML = '<div class="empty"><h2>Storage unavailable</h2><p>This browser blocked local storage (private/incognito mode?). Open the page in a normal window.</p></div>';
+    console.error(err);
+  });
+})();
+</script>
+</body>
+</html>
