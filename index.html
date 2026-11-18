@@ -1079,8 +1079,13 @@ footer{border-top:1px solid var(--line)}
       }).then(function (res) {
         busy(regF, false, 'Create account');
         if (!res.ok) { note(regF, res.error || 'Registration failed', false); return; }
+        var lg = regF.email.value.trim();
         regF.reset();
-        note(regF, '✓ Thank you! Your account is waiting for approval. We will email you as soon as it is approved — then log in here.', true);
+        if (res.status === 'Approved') {
+          showTab('login'); loginF.elements.namedItem('login').value = lg;
+          note(loginF, '✓ Your account is approved! We have emailed you too. Enter your password below to log in.', true);
+          loginF.password.focus();
+        } else note(regF, '✓ Thank you! Your account is waiting for approval. We will email you as soon as it is approved — then log in here.', true);
       }).catch(function (err) { busy(regF, false, 'Create account'); note(regF, err && err.message && !/fetch/i.test(err.message) ? err.message : 'Network error — please try again.', false); });
     });
 
