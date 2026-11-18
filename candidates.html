@@ -140,8 +140,26 @@ form.f{display:flex;flex-direction:column;gap:14px}
 .tabs button[aria-selected="true"]{color:var(--red);border-bottom-color:var(--red)}
 .badge{background:var(--red);color:#fff;border-radius:999px;font-size:11.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center}
 .badge:empty{display:none}
-body[data-view="jobs"] .bench-only{display:none!important}
+body:not([data-view="bench"]) .bench-only{display:none!important}
 body:not([data-view="jobs"]) .jobs-only{display:none!important}
+body:not([data-view="members"]) .members-only{display:none!important}
+body.locked > *:not(#loginGate):not(.toast){display:none!important}
+#loginGate{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;background:var(--soft)}
+body.locked #loginGate{display:flex}
+.gate-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px 28px;width:min(400px,100%);display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 40px rgba(0,0,0,.06)}
+.gate-card h1{font-size:26px}
+.gate-card p{margin:0;color:var(--muted);font-size:14px}
+.gate-card label{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:500;color:var(--gray)}
+.gate-card input{font:inherit;font-size:16px;border:1px solid #CFC8C5;border-radius:8px;padding:12px 14px}
+.gate-card input:focus{outline:2px solid var(--red);outline-offset:1px}
+.gate-note{min-height:20px;font-size:14px;color:var(--red)}
+.mem-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.mem-bar .chip{font:inherit;font-size:13px;font-weight:500;border:1px solid #D9D2CF;background:#fff;color:var(--gray);border-radius:999px;padding:6px 12px;cursor:pointer}
+.mem-bar .chip[aria-pressed="true"]{background:var(--gray);border-color:var(--gray);color:#fff}
+.mem-bar input[type=search]{font:inherit;font-size:14px;border:1px solid #CFC8C5;border-radius:8px;padding:8px 12px;flex:1 1 220px;min-width:0}
+.mem-bar .opt{margin:0 0 0 auto;font-size:13.5px}
+.pill.Pending{background:#FFF3D6;color:#7A5300}
+.pill.Approved{background:#E3F4EA;color:#17663A}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 /* Jobs admin */
@@ -199,7 +217,18 @@ dialog.wide{width:min(900px,94vw)}
 .privacy{font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;padding:10px 14px;margin:0 0 4px}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="loginGate">
+  <form class="gate-card" id="gateForm">
+    <div class="logo" style="pointer-events:none"><div class="logo-mark">BM</div><div class="logo-name">Bas<span>Man</span></div></div>
+    <h1>Admin login</h1>
+    <p>Private area for jobs, applicants, members and your candidate bench.</p>
+    <label>Admin password<input type="password" id="gatePw" required autocomplete="current-password" placeholder="Your admin password or admin key"></label>
+    <button type="submit" class="btn btn-red" id="gateBtn">Log in</button>
+    <div class="gate-note" id="gateNote" aria-live="polite"></div>
+    <p style="font-size:12.5px">First time? Use the <b>admin key</b> from the Google script log, then set a simple password with 🔑 Password.</p>
+  </form>
+</div>
 
 <header>
   <div class="head">
@@ -210,6 +239,8 @@ dialog.wide{width:min(900px,94vw)}
     <div class="head-actions">
       <button class="btn btn-outline btn-sm bench-only" id="syncBtn" title="Import new applicants from your Google Drive">☁ Sync applicants</button>
       <button class="btn btn-outline btn-sm" id="syncSetBtn" title="Google Drive sync settings" aria-label="Google Drive settings">⚙ Settings</button>
+      <button class="btn btn-outline btn-sm" id="pwBtn" title="Change admin password">🔑 Password</button>
+      <button class="btn btn-outline btn-sm" id="logoutBtn" title="Log out of the admin area">⎋ Log out</button>
       <button class="btn btn-outline btn-sm bench-only" id="exportBtn" title="Download a backup file of all candidates and resumes">⬇ Backup</button>
       <label class="btn btn-outline btn-sm bench-only" title="Restore candidates from a backup file">⬆ Restore<input type="file" id="importFile" accept=".json,application/json" hidden></label>
       <button class="btn btn-red bench-only" id="addBtn">+ Add candidate</button>
@@ -222,6 +253,7 @@ dialog.wide{width:min(900px,94vw)}
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-view="bench" aria-selected="true">Candidate bench</button>
     <button type="button" role="tab" data-view="jobs" aria-selected="false">Jobs &amp; applications <span class="badge" id="newBadge" title="New applications waiting for review"></span></button>
+    <button type="button" role="tab" data-view="members" aria-selected="false">Members <span class="badge" id="memBadge" title="Members waiting for approval"></span></button>
   </nav>
 
   <section class="bench-only">
@@ -262,6 +294,27 @@ dialog.wide{width:min(900px,94vw)}
   </div>
 
   <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="members-only" id="viewMembers">
+    <div class="top">
+      <div>
+        <p class="eyebrow">Private · Members</p>
+        <h1>Members</h1>
+        <p>Job seekers who registered on your website. Approved Premium members see the HR email, phone / WhatsApp and recruiter on every job.</p>
+      </div>
+      <div class="top-actions"><button class="btn btn-outline btn-sm" id="memRefresh">↻ Refresh</button></div>
+    </div>
+    <div class="mem-bar" id="memBar">
+      <button type="button" class="chip" data-ms="" aria-pressed="false">All</button>
+      <button type="button" class="chip" data-ms="Pending" aria-pressed="true">Waiting</button>
+      <button type="button" class="chip" data-ms="Approved" aria-pressed="false">Approved</button>
+      <button type="button" class="chip" data-ms="Rejected" aria-pressed="false">Rejected</button>
+      <input type="search" id="memQ" placeholder="Search name, email or phone" aria-label="Search members">
+      <label class="opt"><input type="checkbox" id="memNotify" checked> Email member when I approve</label>
+    </div>
+    <div class="apps" id="memList"><div class="loading">Loading…</div></div>
+    <div style="height:80px"></div>
   </section>
 
   <section class="jobs-only" id="viewJobs">
@@ -402,12 +455,12 @@ dialog.wide{width:min(900px,94vw)}
         </div>
         <label>What we're looking for <span class="hint">(🔸)</span><textarea name="lookingFor" rows="3" placeholder="8–10 years of overall IT experience&#10;Minimum 5+ years of hands-on RPA development"></textarea></label>
 
+        <div class="row2">
+          <label>Client company <span class="hint">— shown on website; hidden in Free WhatsApp post</span><input name="company" placeholder="e.g. Baellchen Technology"></label>
+          <label>Company tagline<input name="companyAbout" placeholder="Driving Transformation Through Technology"></label>
+        </div>
         <fieldset class="private-box">
-          <legend>🔒 Private — Premium posts only, never shown on the website or free posts</legend>
-          <div class="row2">
-            <label>Client company<input name="company" placeholder="e.g. Baellchen Technology"></label>
-            <label>Company tagline<input name="companyAbout" placeholder="Driving Transformation Through Technology"></label>
-          </div>
+          <legend>🔒 Premium only — website Premium members &amp; Premium WhatsApp post</legend>
           <label>Posted by <span class="hint">— recruiter name &amp; agency</span><input name="postedBy" placeholder="e.g. Rithvika Banavath (Nethra Recruitment Solutions)"></label>
           <div class="row3">
             <label>Apply email<input name="applyEmail" type="email" placeholder="hr@company.com"></label>
@@ -480,6 +533,20 @@ dialog.wide{width:min(900px,94vw)}
     </div>
     <div class="apps" id="appsList"></div>
   </div>
+</dialog>
+
+<dialog id="pwDlg">
+  <form class="f" id="pwForm" method="dialog">
+    <div class="dlg-head"><h2>Change admin password</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dlg-body">
+      <div class="f" style="gap:14px">
+        <p style="margin:0;font-size:14px;color:var(--muted)">Use this password to log in to this page on any device. Your admin key keeps working too.</p>
+        <label>New password <span class="hint">(at least 8 characters)</span><input type="password" name="pw1" minlength="8" required autocomplete="new-password"></label>
+        <label>Confirm new password<input type="password" name="pw2" minlength="8" required autocomplete="new-password"></label>
+      </div>
+    </div>
+    <div class="dlg-foot"><button type="button" class="btn btn-outline" data-close>Cancel</button><button type="submit" class="btn btn-red">Save password</button></div>
+  </form>
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -835,7 +902,7 @@ dialog.wide{width:min(900px,94vw)}
     setSync(cfg); syncDlg.close();
     if (document.body.dataset.view === 'jobs') loadJobs(); else runSync(cfg);
   });
-  $('syncForget').addEventListener('click', function () { setSync(null); syncDlg.close(); toast('Sync settings removed from this device'); });
+  $('syncForget').addEventListener('click', function () { setSync(null); location.reload(); });
 
   // ===== Jobs & applications (live from your Google Sheet) =====
   var J = { jobs: [], apps: [], loaded: false, jobId: null, st: '' };
@@ -903,7 +970,7 @@ dialog.wide{width:min(900px,94vw)}
       if (j.workMode) meta.push('<span>🏠 ' + esc(j.workMode) + '</span>');
       if (j.salary) meta.push('<span>💰 ' + esc(j.salary) + '</span>');
       if (j.type) meta.push('<span>🕒 ' + esc(j.type) + '</span>');
-      if (j.company) meta.push('<span title="Private — only in Premium posts">🔒 ' + esc(j.company) + '</span>');
+      if (j.company) meta.push('<span>🏢 ' + esc(j.company) + '</span>');
       meta.push('<span>ID ' + esc(j.id) + '</span>');
       return '<article class="jcard' + (open ? '' : ' closed') + '">' +
         '<div class="jtop"><div style="min-width:0"><h3>' + esc(j.title) + '</h3><div class="jmeta">' + meta.join('') + '</div></div>' +
@@ -1298,12 +1365,117 @@ dialog.wide{width:min(900px,94vw)}
   $('postJobBtn').addEventListener('click', function () { if (needCfg()) openJobForm(null); });
   $('jobsRefresh').addEventListener('click', function () { loadJobs(); });
 
+  // ===== Members (job seekers) =====
+  var MB = { list: [], st: 'Pending', loaded: false };
+  function updateMemBadge() {
+    var n = MB.list.filter(function (m) { return m.status === 'Pending'; }).length;
+    $('memBadge').textContent = n ? String(n) : '';
+  }
+  async function loadMembers(quiet) {
+    var cfg = getSync(); if (!cfg) return;
+    if (!quiet) $('memList').innerHTML = '<div class="loading">Loading members…</div>';
+    try {
+      var res = await api(cfg, { action: 'members' });
+      MB.list = res.members || []; MB.loaded = true; renderMembers();
+    } catch (err) {
+      $('memList').innerHTML = '<div class="empty"><h2>Could not load</h2><p>' + esc(err && err.message || err) +
+        '. If you just updated the Google script, publish a <b>New version</b> under Deploy → Manage deployments.</p></div>';
+    }
+  }
+  function renderMembers() {
+    updateMemBadge();
+    var c = { Pending: 0, Approved: 0, Rejected: 0 };
+    MB.list.forEach(function (m) { c[m.status]++; });
+    $('memBar').querySelectorAll('[data-ms]').forEach(function (b) {
+      var n = b.dataset.ms ? c[b.dataset.ms] : MB.list.length;
+      b.textContent = { '': 'All', Pending: 'Waiting', Approved: 'Approved', Rejected: 'Rejected' }[b.dataset.ms] + ' (' + n + ')';
+      b.setAttribute('aria-pressed', String(b.dataset.ms === MB.st));
+    });
+    var q = $('memQ').value.toLowerCase().trim();
+    var list = MB.list.filter(function (m) {
+      return (!MB.st || m.status === MB.st) && (!q || (m.name + ' ' + m.email + ' ' + m.phone).toLowerCase().indexOf(q) !== -1);
+    }).sort(function (a, b) { return b.registered - a.registered; });
+    if (!list.length) {
+      $('memList').innerHTML = '<div class="loading">' + (MB.list.length ? 'No members here.' : 'No registrations yet. Members register from the Jobs section of your website.') + '</div>';
+      return;
+    }
+    $('memList').innerHTML = list.map(function (m) {
+      var label = { Pending: 'Waiting', Approved: 'Approved', Rejected: 'Rejected' }[m.status];
+      return '<div class="app ' + (m.status === 'Approved' ? 'Shortlisted' : m.status === 'Rejected' ? 'Rejected' : '') + '"><div class="app-main">' +
+        '<div class="app-name"><b>' + esc(m.name) + '</b><span class="pill ' + esc(m.status) + '">' + label + '</span></div>' +
+        '<div class="meta"><a href="mailto:' + esc(m.email) + '">✉ ' + esc(m.email) + '</a>' +
+          (m.phone ? '<a href="tel:' + esc(m.phone.replace(/[^\d+]/g, '')) + '">☏ ' + esc(m.phone) + '</a>' +
+                     '<a href="https://wa.me/' + esc(m.phone.replace(/\D/g, '')) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '</div>' +
+        '<div class="meta"><span>Registered ' + fmtDate(m.registered) + '</span>' + (m.lastLogin ? '<span>Last login ' + fmtDate(m.lastLogin) + '</span>' : '') + '</div></div>' +
+        '<div class="app-actions">' +
+          (m.status !== 'Approved' ? '<button class="btn btn-ok btn-sm" data-mset="Approved" data-id="' + esc(m.id) + '">✓ Approve</button>' : '') +
+          (m.status === 'Pending' ? '<button class="btn btn-no btn-sm" data-mset="Rejected" data-id="' + esc(m.id) + '">✕ Reject</button>' : '') +
+          (m.status === 'Approved' ? '<button class="btn btn-no btn-sm" data-mset="Rejected" data-id="' + esc(m.id) + '">Revoke access</button>' : '') +
+          '<button class="btn btn-outline btn-sm" data-mdel="' + esc(m.id) + '" style="color:var(--red)">Delete</button>' +
+        '</div></div>';
+    }).join('');
+  }
+  $('memBar').addEventListener('click', function (e) { var c = e.target.closest('[data-ms]'); if (!c) return; MB.st = c.dataset.ms; renderMembers(); });
+  $('memQ').addEventListener('input', renderMembers);
+  $('memRefresh').addEventListener('click', function () { loadMembers(); });
+  $('memList').addEventListener('click', async function (e) {
+    var b = e.target.closest('[data-mset],[data-mdel]'); if (!b) return;
+    var cfg = needCfg(); if (!cfg) return;
+    var id = b.dataset.id || b.dataset.mdel, m = MB.list.find(function (x) { return x.id === id; });
+    if (b.dataset.mdel) {
+      if (!confirm('Delete ' + m.name + "'s account? They will need to register again.")) return;
+      b.disabled = true;
+      try { await apiPost(cfg, { action: 'deleteMember', id: id }); MB.list.splice(MB.list.indexOf(m), 1); renderMembers(); toast('Member deleted'); }
+      catch (err) { b.disabled = false; toast('Failed — ' + (err && err.message || err)); }
+      return;
+    }
+    var status = b.dataset.mset, notify = status === 'Approved' && $('memNotify').checked;
+    b.closest('.app').querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+    try {
+      var res = await apiPost(cfg, { action: 'setMemberStatus', id: id, status: status, notify: notify });
+      m.status = status; renderMembers();
+      toast(status === 'Approved' ? (res.emailed ? 'Approved — ' + m.name + ' has been emailed' : 'Approved ' + m.name)
+                                  : (b.textContent.indexOf('Revoke') === 0 ? 'Access revoked — ' + m.name + ' is logged out' : 'Rejected ' + m.name));
+    } catch (err) { toast('Failed — ' + (err && err.message || err)); renderMembers(); }
+  });
+
+  // ===== Admin login gate, log out, password =====
+  $('gateForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var pw = $('gatePw').value, btn = $('gateBtn'), url = (getSync() || {}).url || DEFAULT_SYNC_URL;
+    btn.disabled = true; btn.textContent = 'Checking…'; $('gateNote').textContent = '';
+    try {
+      var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'adminLogin', password: pw }) }).then(function (r) { return r.json(); });
+      if (!res.ok) throw new Error(res.error || 'Login failed');
+      setSync({ url: url, key: res.key });
+      location.reload();
+    } catch (err) {
+      $('gateNote').textContent = /fetch|network/i.test(String(err)) ? 'Could not reach Google. Check your internet, or the script may need a New version deployed.' : String(err.message || err);
+      btn.disabled = false; btn.textContent = 'Log in';
+    }
+  });
+  $('logoutBtn').addEventListener('click', function () {
+    if (!confirm('Log out of the admin area on this device?')) return;
+    setSync(null); location.reload();
+  });
+  var pwDlg = $('pwDlg'), pwForm = $('pwForm');
+  $('pwBtn').addEventListener('click', function () { pwForm.reset(); pwDlg.showModal(); });
+  pwForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var a = pwForm.elements.namedItem('pw1').value, b = pwForm.elements.namedItem('pw2').value;
+    if (a !== b) { toast('Passwords do not match'); return; }
+    var cfg = needCfg(); if (!cfg) return;
+    try { await apiPost(cfg, { action: 'setAdminPassword', password: a }); pwDlg.close(); toast('Admin password changed — use it next time you log in'); }
+    catch (err) { toast('Could not change password — ' + (err && err.message || err)); }
+  });
+
   // ----- view switching -----
   function setView(v) {
     document.body.dataset.view = v;
     document.querySelectorAll('.tabs [data-view]').forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.view === v)); });
     try { localStorage.setItem('basman-view', v); } catch (e) {}
     if (v === 'jobs') loadJobs(J.loaded);
+    if (v === 'members') loadMembers(MB.loaded);
   }
   document.querySelectorAll('.tabs [data-view]').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.view); }); });
 
@@ -1337,9 +1509,16 @@ dialog.wide{width:min(900px,94vw)}
   });
 
   // ===== Start =====
-  var startView = location.hash === '#jobs' ? 'jobs' : (function () { try { return localStorage.getItem('basman-view'); } catch (e) { return null; } })();
-  setView(startView === 'jobs' ? 'jobs' : 'bench');
-  if (startView !== 'jobs' && getSync()) api(getSync(), { action: 'list' }).then(function (r) { J.apps = r.candidates || []; updateBadge(); }).catch(function () {});
+  if (!getSync()) {
+    document.body.classList.add('locked');
+    setTimeout(function () { $('gatePw').focus(); }, 50);
+  } else {
+    document.body.classList.remove('locked');
+    var startView = /^#(jobs|members)$/.test(location.hash) ? location.hash.slice(1) : (function () { try { return localStorage.getItem('basman-view'); } catch (e) { return null; } })();
+    setView(['jobs', 'members'].indexOf(startView) !== -1 ? startView : 'bench');
+    if (startView !== 'jobs') api(getSync(), { action: 'list' }).then(function (r) { J.apps = r.candidates || []; updateBadge(); }).catch(function () {});
+    if (startView !== 'members') api(getSync(), { action: 'members' }).then(function (r) { MB.list = r.members || []; updateMemBadge(); }).catch(function () {});
+  }
   openDB().then(function (d) {
     db = d;
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist();

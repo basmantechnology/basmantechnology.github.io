@@ -95,3 +95,27 @@ title → company and recruiter (Premium only) → location, experience, relevan
 Go to **Jobs & applications → ⬆ Import jobs** and choose that file. All three are posted in one go.
 - **Senior RPA Developer:** the recruiter's name and contact weren't in the original post, so add them (Edit job → 🔒 Private) before sending the Premium version.
 - **Automation Engineer:** no location was given. Add it if you know it.
+
+
+---
+
+# Admin login & members
+
+## Update (needed once)
+1. **Paste the new Code.gs** into your script (BasManTechnlodData), save, and run **setup**. This adds a **Members** tab to your sheet.
+2. **Publish a new version:** **Deploy → Manage deployments → ✏️ → New version → Deploy**.
+3. **Upload to GitHub:** the new `index.html` and `candidates.html`.
+
+## Admin login
+- `candidates.html` now opens with an **Admin login** screen.
+- **First time:** log in with your **admin key**, then click **🔑 Password** and set an easy password (at least 8 characters). Use that password from then on, on any device.
+- **⎋ Log out** when you're on a shared computer.
+- **5 wrong passwords** lock the login for 15 minutes.
+
+## Members (job seekers)
+- **Visitors** see jobs without company or contacts, plus a **Log in / Register** button.
+- **When someone registers,** you get an email. Open **candidates.html → Members** and click **✓ Approve**. They get an email saying they're approved.
+- **Everyone** sees the job and the **company name**.
+- **Approved Premium members** who log in also see the **recruiter, HR email, WhatsApp, phone, how to apply and company website**.
+- **Revoke access** logs a member out straight away. **Delete** removes their account completely.
+- **Passwords** are stored scrambled (hashed), so nobody can read them, not even you. A member who forgets their password: delete their account and ask them to register again.

@@ -146,6 +146,8 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .job-posted.new{color:var(--red)}
 .job-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 12px;font-size:14px;color:var(--muted)}
 .job-cat{font-weight:600;color:var(--red)}
+.job-company{font-size:15px;font-weight:600;color:var(--gray);margin-top:3px}
+.job-company span{font-weight:400;color:var(--muted)}
 .job-must{margin-top:-6px}
 .job-must b{color:var(--gray)}
 .job-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
@@ -163,6 +165,33 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .applying{display:none;align-items:center;gap:10px;justify-content:space-between;background:#FBEFF0;border:1px solid #EDC7CA;color:var(--red-dark);border-radius:10px;padding:10px 14px;font-size:14px}
 .applying.show{display:flex}
 .applying button{background:none;border:0;color:var(--red-dark);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
+
+/* Members */
+.member-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.member-bar .mb-text{font-size:14px;color:var(--muted)}
+.member-bar .mb-text b{color:var(--gray)}
+.member-bar .btn{min-height:40px;font-size:14px;padding:0 16px}
+.mb-badge{display:inline-flex;align-items:center;gap:6px;background:#E3F4EA;color:#17663A;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600}
+.job-contact{border:1px solid #CDE7D6;background:#F4FBF6;border-radius:10px;padding:12px 14px;margin:0 0 14px;display:grid;gap:4px 18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));font-size:14.5px}
+.job-contact a{color:var(--red);font-weight:600;word-break:break-word}
+.job-contact .jc-title{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#17663A}
+.job-locked{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;border:1px dashed #E3BFC2;background:#FDF7F7;border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:14px;color:var(--red-dark)}
+.job-locked button{background:none;border:0;padding:2px;font:inherit;font-weight:700;color:var(--red);text-decoration:underline;cursor:pointer}
+#memberDlg{border:0;border-radius:16px;padding:0;width:min(440px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#memberDlg::backdrop{background:rgba(31,30,30,.5)}
+.md-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
+.md-head h2{font-size:22px}
+.md-x{background:none;border:0;font-size:28px;line-height:1;cursor:pointer;color:var(--gray)}
+.md-tabs{display:flex;gap:4px;padding:0 22px;border-bottom:1px solid var(--line)}
+.md-tabs button{flex:1;background:none;border:0;border-bottom:3px solid transparent;padding:10px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.md-tabs button[aria-selected="true"]{color:var(--red);border-bottom-color:var(--red)}
+.md-body{display:flex;flex-direction:column;gap:12px;padding:18px 22px 22px}
+.md-body[hidden]{display:none}
+.md-body label{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:500;color:var(--gray)}
+.md-lead{margin:0;font-size:14px;color:var(--muted)}
+.md-hint{font-weight:400;color:#7A7A80}
+.md-note{margin:0;font-size:14px;min-height:20px}
+.md-note.ok{color:#17663A}.md-note.err{color:var(--red)}
 
 /* Mobile */
 @media (max-width:600px){
@@ -189,6 +218,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
   .foot{flex-direction:column;align-items:flex-start}
   .wa-float{right:14px;bottom:14px;width:52px;height:52px}
   .jobs-bar select{flex:1 1 45%}
+  .member-bar{justify-content:flex-start;width:100%}
+  .member-bar .btn{flex:1 1 auto}
+  #memberDlg{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0}
   .jobs-bar input{font-size:16px}
   .job{padding:18px}
   .job h3{font-size:19px}
@@ -316,6 +348,7 @@ footer{border-top:1px solid var(--line)}
         <h2>Current jobs</h2>
         <p>Newest jobs first. Filter by skill, date posted or location, then apply in one step.</p>
       </div>
+      <div class="member-bar" id="memberBar"></div>
     </div>
     <div class="jobs-bar">
       <input type="search" id="jobQ" placeholder="Search jobs — e.g. UiPath, Python, Pune" aria-label="Search jobs">
@@ -423,6 +456,34 @@ footer{border-top:1px solid var(--line)}
   <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
 </a>
 
+<dialog id="memberDlg" aria-labelledby="memberDlgTitle">
+  <div class="md-head">
+    <h2 id="memberDlgTitle">💎 Member access</h2>
+    <button type="button" class="md-x" data-mclose aria-label="Close">×</button>
+  </div>
+  <div class="md-tabs" role="tablist">
+    <button type="button" role="tab" data-mtab="login" aria-selected="true">Log in</button>
+    <button type="button" role="tab" data-mtab="register" aria-selected="false">Register</button>
+  </div>
+  <form id="loginForm" class="md-body">
+    <p class="md-lead">Premium members see the HR email, phone / WhatsApp and recruiter details on every job.</p>
+    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+    <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+    <button type="submit" class="btn btn-red">Log in</button>
+    <p class="md-note" aria-live="polite"></p>
+  </form>
+  <form id="registerForm" class="md-body" hidden>
+    <p class="md-lead">Create your account. Once we approve it, you can log in and see HR contact details for every job.</p>
+    <label>Full name<input type="text" name="name" required autocomplete="name"></label>
+    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+    <label>Phone / WhatsApp<input type="tel" name="phone" required autocomplete="tel" placeholder="+91 …"></label>
+    <label>Password <span class="md-hint">(at least 6 characters)</span><input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
+    <label>Confirm password<input type="password" name="password2" required minlength="6" autocomplete="new-password"></label>
+    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <button type="submit" class="btn btn-red">Create account</button>
+    <p class="md-note" aria-live="polite"></p>
+  </form>
+</dialog>
 <script>
   // ===== SETTINGS =====
   // 1) Every form message is emailed here (via FormSubmit — free)
@@ -580,7 +641,14 @@ footer{border-top:1px solid var(--line)}
     var listEl = document.getElementById('jobList'), chipsEl = document.getElementById('jobChips');
     var qEl = document.getElementById('jobQ'), whenEl = document.getElementById('jobWhen'), locEl = document.getElementById('jobLoc');
     var countEl = document.getElementById('jobCount'), form = document.getElementById('careersForm');
-    var jobs = [], chip = '';
+    var jobs = [], chip = '', member = null;
+    var MKEY = 'basman-member';
+    function getMember() { try { return JSON.parse(localStorage.getItem(MKEY)) || null; } catch (e) { return null; } }
+    function setMember(v) { try { v ? localStorage.setItem(MKEY, JSON.stringify(v)) : localStorage.removeItem(MKEY); } catch (e) {} }
+    function post(body) {
+      return fetch(CAREERS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json(); });
+    }
     var EXP = { '0-1': 'Fresher (0–1 yr)', '1-3': '1–3 yrs', '4-6': '4–6 yrs', '7-9': '7–9 yrs', '10-14': '10–14 yrs', '15+': '15–20+ yrs' };
     var DAY = 86400000;
 
@@ -654,11 +722,26 @@ footer{border-top:1px solid var(--line)}
           ul('Key skills &amp; expertise', req) + ul('Key responsibilities', resp) + ul('What we are looking for', lf);
         var tags = list(j.skills).map(function (s) { return '<span>' + esc(s) + '</span>'; }).join('');
         var fresh = Date.now() - j.posted < 3 * DAY;
+        var contact = '';
+        if (member) {
+          var c = [];
+          if (j.postedBy) c.push('<span>👤 ' + esc(j.postedBy) + '</span>');
+          if (j.applyEmail) c.push('<span>📩 <a href="mailto:' + esc(j.applyEmail) + '?subject=' + encodeURIComponent('Application: ' + j.title) + '">' + esc(j.applyEmail) + '</a></span>');
+          if (j.applyWhatsapp) c.push('<span>📱 <a href="https://wa.me/' + esc(String(j.applyWhatsapp).replace(/\D/g, '').replace(/^(\d{10})$/, '91$1')) + '" target="_blank" rel="noopener">WhatsApp ' + esc(j.applyWhatsapp) + '</a></span>');
+          if (j.contactPhone) c.push('<span>📞 <a href="tel:' + esc(String(j.contactPhone).replace(/[^\d+]/g, '')) + '">' + esc(j.contactPhone) + '</a></span>');
+          if (j.howToApply) c.push('<span>💬 ' + esc(j.howToApply) + '</span>');
+          if (j.companyWebsite) c.push('<span>🌐 <a href="' + esc(/^https?:/i.test(j.companyWebsite) ? j.companyWebsite : 'https://' + j.companyWebsite) + '" target="_blank" rel="noopener">' + esc(j.companyWebsite) + '</a></span>');
+          contact = c.length ? '<div class="job-contact"><span class="jc-title">💎 Member details</span>' + c.join('') + '</div>' : '';
+        } else {
+          contact = '<div class="job-locked">🔒 HR email, phone &amp; recruiter details are shown to Premium members. <button type="button" data-member="login">Log in</button> or <button type="button" data-member="register">Register</button></div>';
+        }
         return '<article class="job" id="job-' + esc(j.id) + '">' +
-          '<div class="job-top"><h3>' + esc(j.title) + '</h3><span class="job-posted' + (fresh ? ' new' : '') + '" title="' + esc(new Date(j.posted).toLocaleString()) + '">' + ago(j.posted) + '</span></div>' +
+          '<div class="job-top"><div><h3>' + esc(j.title) + '</h3>' +
+          (j.company ? '<div class="job-company">🏢 ' + esc(j.company) + (j.companyAbout ? ' <span>— ' + esc(j.companyAbout) + '</span>' : '') + '</div>' : '') + '</div><span class="job-posted' + (fresh ? ' new' : '') + '" title="' + esc(new Date(j.posted).toLocaleString()) + '">' + ago(j.posted) + '</span></div>' +
           '<div class="job-meta">' + meta.join('') + '</div>' +
           (must.length ? '<div class="job-meta job-must">' + must.join('') + '</div>' : '') +
           (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
+          contact +
           (details ? '<details><summary>View job details</summary>' + details + '</details>' : '') +
           '<div class="job-actions"><button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>' +
           '<button type="button" class="btn btn-outline" data-share="' + esc(j.id) + '">Copy job link</button></div></article>';
@@ -710,7 +793,11 @@ footer{border-top:1px solid var(--line)}
 
     window.reloadJobs = function () {
       if (!CAREERS_SCRIPT_URL || CAREERS_SCRIPT_URL.indexOf('PASTE') === 0) { jobs = []; buildFilters(); render(); return; }
-      fetch(CAREERS_SCRIPT_URL + '?action=jobs').then(function (r) { return r.json(); }).then(function (res) {
+      var m = getMember();
+      fetch(CAREERS_SCRIPT_URL + '?action=jobs' + (m && m.token ? '&token=' + encodeURIComponent(m.token) : '')).then(function (r) { return r.json(); }).then(function (res) {
+        if (res && res.sessionExpired) { setMember(null); m = null; }
+        member = res && res.member ? res.member : null;
+        renderMemberBar();
         jobs = (res && res.ok && res.jobs || []).sort(function (a, b) { return b.posted - a.posted; });
         var sel = form.elements.namedItem('jobId').value;
         if (sel && !jobs.some(function (j) { return j.id === sel; })) window.clearJobSelection();
@@ -719,6 +806,56 @@ footer{border-top:1px solid var(--line)}
         listEl.innerHTML = '<div class="jobs-empty">Jobs could not be loaded right now. Please refresh the page, or <a href="#careers">send us your resume</a>.</div>';
       });
     };
+    // ----- Member login / register -----
+    var dlg = document.getElementById('memberDlg'), loginF = document.getElementById('loginForm'), regF = document.getElementById('registerForm');
+    function renderMemberBar() {
+      var bar = document.getElementById('memberBar');
+      if (member) bar.innerHTML = '<span class="mb-badge">💎 ' + esc(member.name) + ' · member</span><button type="button" class="btn btn-outline" data-member="logout">Log out</button>';
+      else bar.innerHTML = '<span class="mb-text"><b>Premium members</b> see HR email &amp; phone</span><button type="button" class="btn btn-outline" data-member="login">Log in</button><button type="button" class="btn btn-red" data-member="register">Register</button>';
+    }
+    function showTab(t) {
+      dlg.querySelectorAll('[data-mtab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.mtab === t)); });
+      loginF.hidden = t !== 'login'; regF.hidden = t !== 'register';
+      setTimeout(function () { (t === 'login' ? loginF : regF).querySelector('input').focus(); }, 50);
+    }
+    function openMember(t) { showTab(t); if (!dlg.open) dlg.showModal(); }
+    dlg.querySelectorAll('[data-mtab]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.mtab); }); });
+    dlg.querySelector('[data-mclose]').addEventListener('click', function () { dlg.close(); });
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-member]'); if (!b) return;
+      if (b.dataset.member === 'logout') {
+        var m = getMember(); setMember(null); member = null;
+        if (m && m.token) post({ action: 'logout', token: m.token }).catch(function () {});
+        window.reloadJobs();
+      } else openMember(b.dataset.member);
+    });
+    function note(f, msg, ok) { var n = f.querySelector('.md-note'); n.textContent = msg; n.className = 'md-note ' + (ok ? 'ok' : 'err'); }
+    function busy(f, on, label) { var b = f.querySelector('button[type=submit]'); b.disabled = on; if (label) b.textContent = label; }
+
+    loginF.addEventListener('submit', function (e) {
+      e.preventDefault();
+      busy(loginF, true, 'Logging in…'); note(loginF, '', true);
+      post({ action: 'login', email: loginF.email.value.trim(), password: loginF.password.value }).then(function (res) {
+        busy(loginF, false, 'Log in');
+        if (!res.ok) { note(loginF, res.error || 'Login failed', false); return; }
+        setMember({ token: res.token, name: res.name });
+        loginF.reset(); dlg.close(); window.reloadJobs();
+      }).catch(function () { busy(loginF, false, 'Log in'); note(loginF, 'Network error — please try again.', false); });
+    });
+    regF.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (regF.password.value !== regF.password2.value) { note(regF, 'Passwords do not match.', false); return; }
+      busy(regF, true, 'Creating account…'); note(regF, '', true);
+      post({ action: 'register', name: regF.elements.namedItem('name').value.trim(), email: regF.email.value.trim(), phone: regF.phone.value.trim(),
+             password: regF.password.value, website: regF.website.value }).then(function (res) {
+        busy(regF, false, 'Create account');
+        if (!res.ok) { note(regF, res.error || 'Registration failed', false); return; }
+        regF.reset();
+        note(regF, '✓ Thank you! Your account is waiting for approval. We will email you as soon as it is approved — then log in here.', true);
+      }).catch(function () { busy(regF, false, 'Create account'); note(regF, 'Network error — please try again.', false); });
+    });
+
+    renderMemberBar();
     window.addEventListener('hashchange', openFromHash);
     window.reloadJobs();
   })();
