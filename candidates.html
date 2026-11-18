@@ -842,9 +842,15 @@ dialog.wide{width:min(900px,94vw)}
 
   // ===== Google Drive sync (applicants from the Careers form) =====
   var SYNC_KEY = 'basman-sync';
-  var DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbwKHx_ieSwA9DBBqPCjldYo-uZ0EQdyVBHVdkxzs_7DR3G0AFkN11mCSeZun1ilolOa/exec';
+  var DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbyP0OJCGnUV6N6qjl2KeG8y8vd2qsPDpaq99b5i4JgvXSLxyXkk4BAi8MlEIfcN_Bvi/exec';
   var syncDlg = $('syncDlg'), syncForm = $('syncForm');
-  function getSync() { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch (e) { return null; } }
+  function getSync() {
+    try {
+      var c = JSON.parse(localStorage.getItem(SYNC_KEY)) || null;
+      if (c && c.url && c.url.indexOf('AKfycbwKHx_') !== -1) { c.url = DEFAULT_SYNC_URL; localStorage.setItem(SYNC_KEY, JSON.stringify(c)); }   // moved to the new web app link
+      return c;
+    } catch (e) { return null; }
+  }
   function setSync(v) { try { v ? localStorage.setItem(SYNC_KEY, JSON.stringify(v)) : localStorage.removeItem(SYNC_KEY); } catch (e) {} }
   function api(cfg, params) {
     var q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
