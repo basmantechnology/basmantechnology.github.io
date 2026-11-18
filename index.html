@@ -143,6 +143,13 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .chip:hover{border-color:var(--gray)}
 .chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
 .job-count{font-size:14px;color:var(--muted);margin:0 0 12px}
+.chips-hint{font-size:12.5px;color:var(--muted);align-self:center;margin-left:4px}
+.pager{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;margin:22px 0 4px}
+.pager button{font:inherit;font-size:14.5px;font-weight:600;min-width:42px;min-height:42px;padding:0 12px;border:1px solid #D9D2CF;background:#fff;color:var(--text);border-radius:8px;cursor:pointer}
+.pager button:hover:not(:disabled){border-color:var(--gray)}
+.pager button[aria-current="page"]{background:var(--red);border-color:var(--red);color:#fff}
+.pager button:disabled{opacity:.4;cursor:default}
+.pager .gap{color:var(--muted);padding:0 2px}
 .job-list{display:grid;gap:14px}
 .job{border:1px solid var(--line);border-radius:14px;padding:22px 24px;background:#fff;transition:box-shadow .2s,border-color .2s}
 .job:hover{border-color:#D9D2CF;box-shadow:0 4px 16px rgba(0,0,0,.05)}
@@ -498,11 +505,21 @@ footer{border-top:1px solid var(--line)}
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
       </select>
+      <select id="jobExp" aria-label="Your experience">
+        <option value="">Any experience</option>
+        <option value="0-1">Fresher (0–1 yr)</option>
+        <option value="1-3">1–3 yrs</option>
+        <option value="4-6">4–6 yrs</option>
+        <option value="7-9">7–9 yrs</option>
+        <option value="10-14">10–14 yrs</option>
+        <option value="15+">15+ yrs</option>
+      </select>
       <select id="jobLoc" aria-label="Location"><option value="">All locations</option></select>
     </div>
     <div class="chips" id="jobChips" role="group" aria-label="Filter by skill"></div>
     <p class="job-count" id="jobCount" aria-live="polite"></p>
     <div class="job-list" id="jobList"><div class="jobs-empty">Loading jobs…</div></div>
+    <nav class="pager" id="jobPager" aria-label="Job pages" hidden></nav>
   </div>
 </section>
 
@@ -819,7 +836,8 @@ footer{border-top:1px solid var(--line)}
     var listEl = document.getElementById('jobList'), chipsEl = document.getElementById('jobChips');
     var qEl = document.getElementById('jobQ'), whenEl = document.getElementById('jobWhen'), locEl = document.getElementById('jobLoc');
     var countEl = document.getElementById('jobCount'), form = document.getElementById('careersForm');
-    var jobs = [], chip = '', member = null, applied = [], profile = null;
+    var expEl = document.getElementById('jobExp'), pagerEl = document.getElementById('jobPager');
+    var jobs = [], chips = [], page = 1, PER_PAGE = 10, member = null, applied = [], profile = null;
     var MKEY = 'basman-member';
     function getMember() { try { return JSON.parse(localStorage.getItem(MKEY)) || null; } catch (e) { return null; } }
     function setMember(v) { try { v ? localStorage.setItem(MKEY, JSON.stringify(v)) : localStorage.removeItem(MKEY); } catch (e) {} }
@@ -840,6 +858,23 @@ footer{border-top:1px solid var(--line)}
       if (d < 30) return 'Posted ' + d + ' days ago';
       return 'Posted ' + new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }
+    // Job experience → [min, max] years. Unknown → null (job is always shown).
+    function expRange(t) {
+      var s = String(t || '').toLowerCase().replace(/[–—]/g, '-');
+      if (!s) return null;
+      if (/fresher|entry|graduate|0\s*-\s*1\b/.test(s) && !/\d\s*\+/.test(s)) return [0, 1];
+      var m = s.match(/(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)/);
+      if (m) return [Number(m[1]), Number(m[2])];
+      m = s.match(/(\d+(?:\.\d+)?)/);
+      return m ? [Number(m[1]), 99] : null;       // "5+ years", "min 5 years" → 5 and above
+    }
+    var MY_EXP = { '0-1': [0, 1], '1-3': [1, 3], '4-6': [4, 6], '7-9': [7, 9], '10-14': [10, 14], '15+': [15, 99] };
+    function expOk(j, want) {
+      if (!want) return true;
+      var r = expRange(j.experience); if (!r) return true;
+      var w = MY_EXP[want];
+      return r[0] <= w[1] && r[1] >= w[0];        // ranges overlap
+    }
     function hay(j) { return [j.title, j.category, j.skills, j.location, j.workMode, j.type, j.domain, j.mandatorySkill, j.salary, j.description, j.requirements, j.responsibilities, j.lookingFor].join(' ').toLowerCase(); }
 
     function buildFilters() {
@@ -855,32 +890,64 @@ footer{border-top:1px solid var(--line)}
       });
       var tags = Object.keys(count).map(function (k) { return count[k]; })
         .sort(function (a, b) { return (b.cat - a.cat) || (b.n - a.n) || a.label.localeCompare(b.label); }).slice(0, 14);
-      chipsEl.innerHTML = '<button type="button" class="chip" data-chip="" aria-pressed="' + (!chip) + '">All</button>' +
-        tags.map(function (t) { return '<button type="button" class="chip" data-chip="' + esc(t.label) + '" aria-pressed="' + (chip.toLowerCase() === t.label.toLowerCase()) + '">' + esc(t.label) + '</button>'; }).join('');
+      var on = chips.map(function (c) { return c.toLowerCase(); });
+      chipsEl.innerHTML = '<button type="button" class="chip" data-chip="" aria-pressed="' + (!chips.length) + '">All</button>' +
+        tags.map(function (t) { return '<button type="button" class="chip" data-chip="' + esc(t.label) + '" aria-pressed="' + (on.indexOf(t.label.toLowerCase()) !== -1) + '">' + esc(t.label) + '</button>'; }).join('') +
+        '<span class="chips-hint">Tip: tap several skills to combine them</span>';
       var cur = locEl.value;
       locEl.innerHTML = '<option value="">All locations</option>' + Object.keys(locs).sort().map(function (l) { return '<option>' + esc(l) + '</option>'; }).join('');
       locEl.value = cur;
     }
 
+    var lastShown = [];
+    function renderPager(pages) {
+      if (pages <= 1) { pagerEl.hidden = true; pagerEl.innerHTML = ''; return; }
+      var nums = [], lo = Math.max(1, Math.min(page - 2, pages - 4)), hi = Math.min(pages, lo + 4);
+      if (lo > 1) nums.push(1); if (lo > 2) nums.push('…');
+      for (var i = lo; i <= hi; i++) nums.push(i);
+      if (hi < pages - 1) nums.push('…'); if (hi < pages) nums.push(pages);
+      pagerEl.innerHTML = '<button type="button" data-page="' + (page - 1) + '"' + (page === 1 ? ' disabled' : '') + '>‹ Previous</button>' +
+        nums.map(function (n) {
+          return n === '…' ? '<span class="gap">…</span>'
+            : '<button type="button" data-page="' + n + '"' + (n === page ? ' aria-current="page"' : '') + ' aria-label="Page ' + n + '">' + n + '</button>';
+        }).join('') +
+        '<button type="button" data-page="' + (page + 1) + '"' + (page === pages ? ' disabled' : '') + '>Next ›</button>';
+      pagerEl.hidden = false;
+    }
+    pagerEl.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-page]'); if (!b || b.disabled) return;
+      page = Number(b.dataset.page); render();
+      document.getElementById('jobs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     function render() {
-      var q = qEl.value.toLowerCase().split(/[,\s]+/).filter(Boolean), when = Number(whenEl.value), loc = locEl.value;
+      var q = qEl.value.toLowerCase().split(/[,\s]+/).filter(Boolean), when = Number(whenEl.value), loc = locEl.value, want = expEl.value;
       var shown = jobs.filter(function (j) {
         if (when && Date.now() - j.posted > when * DAY) return false;
+        if (!expOk(j, want)) return false;
         if (loc && list(j.location).indexOf(loc) === -1 && !(loc === 'Remote' && j.workMode === 'Remote')) return false;
-        if (chip) {
-          var c = chip.toLowerCase();
-          if (j.category.toLowerCase() !== c && list(j.skills).concat(list(j.mandatorySkill)).map(function (x) { return x.toLowerCase(); }).indexOf(c) === -1) return false;
+        if (chips.length) {                         // job matches ANY selected skill
+          var mine = [String(j.category || '')].concat(list(j.skills), list(j.mandatorySkill)).map(function (x) { return x.toLowerCase(); });
+          if (!chips.some(function (c) { return mine.indexOf(c.toLowerCase()) !== -1; })) return false;
         }
         var h = hay(j);
         return q.every(function (w) { return h.indexOf(w) !== -1; });
       });
-      countEl.textContent = jobs.length ? shown.length + ' of ' + jobs.length + ' open job' + (jobs.length === 1 ? '' : 's') : '';
+      var pages = Math.max(1, Math.ceil(shown.length / PER_PAGE));
+      if (page > pages) page = pages;
+      if (page < 1) page = 1;
+      var from = (page - 1) * PER_PAGE, upto = Math.min(shown.length, from + PER_PAGE);
+      countEl.textContent = !jobs.length ? '' : shown.length > PER_PAGE
+        ? 'Showing ' + (from + 1) + '–' + upto + ' of ' + shown.length + (shown.length === jobs.length ? ' open jobs' : ' matching jobs (' + jobs.length + ' open in total)')
+        : shown.length + ' of ' + jobs.length + ' open job' + (jobs.length === 1 ? '' : 's');
+      renderPager(pages);
+      lastShown = shown;
       if (!jobs.length) {
         listEl.innerHTML = '<div class="jobs-empty"><b>No open positions right now.</b><br>We are always looking for talent — <a href="#careers">send us your resume</a> and we will contact you when a matching role opens.</div>';
         return;
       }
       if (!shown.length) { listEl.innerHTML = '<div class="jobs-empty">No jobs match these filters. <a href="#jobs" id="jobReset">Clear filters</a></div>'; return; }
-      listEl.innerHTML = shown.map(function (j) {
+      listEl.innerHTML = shown.slice(from, upto).map(function (j) {
         var meta = [];
         if (j.category) meta.push('<span class="job-cat">' + esc(j.category) + '</span>');
         var place = [j.location, j.workMode && String(j.location || '').toLowerCase() !== j.workMode.toLowerCase() ? j.workMode : ''].filter(Boolean);
@@ -948,7 +1015,7 @@ footer{border-top:1px solid var(--line)}
 
     listEl.addEventListener('click', function (e) {
       var a = e.target.closest('[data-apply]'), s = e.target.closest('[data-share]');
-      if (e.target.id === 'jobReset') { e.preventDefault(); qEl.value = ''; whenEl.value = ''; locEl.value = ''; chip = ''; buildFilters(); render(); return; }
+      if (e.target.id === 'jobReset') { e.preventDefault(); qEl.value = ''; whenEl.value = ''; locEl.value = ''; expEl.value = ''; chips = []; page = 1; buildFilters(); render(); return; }
       if (a) { var j = jobs.find(function (x) { return x.id === a.dataset.apply; }); if (j) selectJob(j); }
       var q = e.target.closest('[data-qapply]');
       if (q) {
@@ -972,15 +1039,26 @@ footer{border-top:1px solid var(--line)}
     });
     chipsEl.addEventListener('click', function (e) {
       var c = e.target.closest('[data-chip]'); if (!c) return;
-      chip = c.dataset.chip;
-      chipsEl.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(b === c)); });
+      var v = c.dataset.chip, at = chips.map(function (x) { return x.toLowerCase(); }).indexOf(v.toLowerCase());
+      if (!v) chips = [];                       // "All" clears every skill
+      else if (at === -1) chips.push(v); else chips.splice(at, 1);
+      var on = chips.map(function (x) { return x.toLowerCase(); });
+      chipsEl.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.chip ? on.indexOf(b.dataset.chip.toLowerCase()) !== -1 : !chips.length)); });
+      page = 1;
       render();
     });
-    [qEl, whenEl, locEl].forEach(function (el) { el.addEventListener('input', render); });
+    [qEl, whenEl, locEl, expEl].forEach(function (el) { el.addEventListener('input', function () { page = 1; render(); }); });
 
     function openFromHash() {
       var m = location.hash.match(/^#job-(.+)$/); if (!m) return;
-      var el = document.getElementById('job-' + decodeURIComponent(m[1])); if (!el) return;
+      var id = decodeURIComponent(m[1]), el = document.getElementById('job-' + id);
+      if (!el) {                                  // the job is on another page (or hidden by a filter)
+        if (!jobs.some(function (j) { return j.id === id; })) return;
+        var at = lastShown.map(function (j) { return j.id; }).indexOf(id);
+        if (at === -1) { qEl.value = ''; whenEl.value = ''; locEl.value = ''; expEl.value = ''; chips = []; buildFilters(); render(); at = lastShown.map(function (j) { return j.id; }).indexOf(id); }
+        page = Math.floor(at / PER_PAGE) + 1; render();
+        el = document.getElementById('job-' + id); if (!el) return;
+      }
       var d = el.querySelector('details'); if (d) d.open = true;
       el.classList.add('flash'); el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(function () { el.classList.remove('flash'); }, 2600);
