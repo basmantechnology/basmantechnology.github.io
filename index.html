@@ -169,6 +169,8 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .job details{margin:0 0 14px}
 .job summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--gray);width:max-content}
 .job summary:hover{color:var(--red)}
+.job summary{padding:6px 0}
+.job details[open] .jd-show,.job details:not([open]) .jd-hide{display:none}
 .job-desc{white-space:pre-line;color:var(--muted);font-size:15px;margin:10px 0 0}
 .job details h4{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--gray);margin:16px 0 6px}
 .job details ul{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
@@ -187,7 +189,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .member-bar .btn{min-height:40px;font-size:14px;padding:0 16px}
 .mb-badge{display:inline-flex;align-items:center;gap:6px;background:#E3F4EA;color:#17663A;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600}
 .job-contact{border:1px solid #CDE7D6;background:#F4FBF6;border-radius:10px;padding:12px 14px;margin:0 0 14px;display:grid;gap:4px 18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));font-size:14.5px}
-.job-contact a{color:var(--red);font-weight:600;word-break:break-word}
+.job-contact a{color:var(--red);font-weight:600;word-break:normal;overflow-wrap:anywhere}
 .job-contact .jc-title{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#17663A}
 .job-locked{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;border:1px dashed #E3BFC2;background:#FDF7F7;border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:14px;color:var(--red-dark)}
 .job-locked button{background:none;border:0;padding:2px;font:inherit;font-weight:700;color:var(--red);text-decoration:underline;cursor:pointer}
@@ -987,7 +989,7 @@ footer{border-top:1px solid var(--line)}
           (must.length ? '<div class="job-meta job-must">' + must.join('') + '</div>' : '') +
           (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
           contact +
-          (details ? '<details class="jd" open><summary>Job description</summary>' + details + '</details>' : '') +
+          (details ? '<details class="jd"><summary><span class="jd-show">View job description</span><span class="jd-hide">Hide job description</span></summary>' + details + '</details>' : '') +
           '<div class="job-actions">' + (member
             ? (applied.indexOf(j.id) !== -1
                 ? '<button type="button" class="btn btn-applied" disabled>✓ Applied</button>'
