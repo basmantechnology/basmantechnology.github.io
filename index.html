@@ -467,7 +467,7 @@ footer{border-top:1px solid var(--line)}
   </div>
   <form id="loginForm" class="md-body">
     <p class="md-lead">Premium members see the HR email, phone / WhatsApp and recruiter details on every job.</p>
-    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+    <label>Email or phone number<input type="text" name="login" required autocomplete="username" placeholder="you@email.com or +91 98765 43210"></label>
     <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
     <button type="submit" class="btn btn-red">Log in</button>
     <p class="md-note" aria-live="polite"></p>
@@ -742,7 +742,7 @@ footer{border-top:1px solid var(--line)}
           (must.length ? '<div class="job-meta job-must">' + must.join('') + '</div>' : '') +
           (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
           contact +
-          (details ? '<details><summary>View job details</summary>' + details + '</details>' : '') +
+          (details ? '<details class="jd" open><summary>Job description</summary>' + details + '</details>' : '') +
           '<div class="job-actions"><button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>' +
           '<button type="button" class="btn btn-outline" data-share="' + esc(j.id) + '">Copy job link</button></div></article>';
       }).join('');
@@ -835,7 +835,7 @@ footer{border-top:1px solid var(--line)}
     loginF.addEventListener('submit', function (e) {
       e.preventDefault();
       busy(loginF, true, 'Logging in…'); note(loginF, '', true);
-      post({ action: 'login', email: loginF.email.value.trim(), password: loginF.password.value }).then(function (res) {
+      post({ action: 'login', login: loginF.elements.namedItem('login').value.trim(), password: loginF.password.value }).then(function (res) {
         busy(loginF, false, 'Log in');
         if (!res.ok) { note(loginF, res.error || 'Login failed', false); return; }
         setMember({ token: res.token, name: res.name });
