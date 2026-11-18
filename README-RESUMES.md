@@ -42,3 +42,56 @@ After that, one click on **☁ Sync applicants** imports every new applicant wit
 **Is it safe?** The website code contains only the `/exec` URL. That URL can submit applications but cannot read anything. Reading applicants needs the ADMIN KEY, which is never in the website code. It is saved only in the browser where you typed it.
 
 **Already set up with an older Code.gs?** Paste in the new Code.gs, then publish a New version (see above). Also add two column headings at the end of row 1 of your "BasMan Applicants" sheet: **LinkedIn** and **Address**.
+
+
+---
+
+# Jobs board (new)
+
+## Update the Google script (needed once)
+1. Open your project on **script.google.com**, select all the old code, and paste in the new `google-apps-script/Code.gs`. Then press **Ctrl + S**.
+2. Choose **setup** and click **▷ Run**. This adds a **Jobs** tab to your sheet and new columns to Applicants. Your existing applicants are kept.
+3. Click **Deploy → Manage deployments → ✏️ → Version: New version → Deploy**. The URL stays the same.
+4. Upload the new `index.html` and `candidates.html` to GitHub.
+
+## Post a job
+`candidates.html` → **Jobs & applications** → **+ Post job**. It appears on your website straight away, newest first.
+Visitors filter by skill (RPA, UiPath, App Development…), by date posted and by location, then click **Apply now**.
+
+## Private client details
+In the **🔒 Private** box, add the client company, tagline, apply email, phone and website.
+These are **never sent to the website**. The company name is also removed automatically from the public text, along with any emails, phone numbers and links.
+
+## WhatsApp posts
+Click **📱 WhatsApp post** on any job to get two ready-made versions:
+- **Free group:** company name and contact details hidden. You can optionally add your website apply link.
+- **Premium group:** includes the company, apply email, phone and website.
+
+## Approve applicants
+You get an email for every application, with the job named in the subject.
+On **Jobs & applications**, click **Review applicants** → **✓ Approve** or **✕ Reject**.
+Approving sends the candidate a "You have been shortlisted" email. Untick the box if you don't want that.
+The red number on the tab shows how many applications are waiting for review.
+
+
+---
+
+# Job post template (paste → post → WhatsApp)
+
+1. **+ Post job → 📋 Paste a recruiter post** (from LinkedIn, WhatsApp or email) **→ ✨ Fill form from post.**
+2. **Check every field.** The reader is good but not perfect. Add anything missing, such as the location or the recruiter's name.
+3. **Click Post job.** It goes live on your website, and the **WhatsApp posts** open straight away:
+   - **💎 Premium:** company, recruiter, apply email, WhatsApp number, how to apply and website
+   - **👥 Free:** the same job without any company or contact details
+4. **Copy each post** into its group, or use **Open in WhatsApp**.
+
+Every post uses the same template. A section only appears when you filled it in:
+title → company and recruiter (Premium only) → location, experience, relevant experience, mandatory skill, type, domain, openings, salary → intro → ✅ key skills → → responsibilities → 🔸 what we're looking for → how to apply (Premium only) → footer.
+
+**Post only to WhatsApp, not the website?** Set **Status: Closed** before posting. The WhatsApp posts still work.
+
+## Your 3 previous jobs
+`previous-jobs.json` holds the Senior RPA Developer, UiPath RPA Developer and Automation Engineer jobs.
+Go to **Jobs & applications → ⬆ Import jobs** and choose that file. All three are posted in one go.
+- **Senior RPA Developer:** the recruiter's name and contact weren't in the original post, so add them (Edit job → 🔒 Private) before sending the Premium version.
+- **Automation Engineer:** no location was given. Add it if you know it.

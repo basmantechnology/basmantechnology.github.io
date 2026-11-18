@@ -122,6 +122,46 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .panel-red .note{color:#FFE3E5}
 .contact-links{margin:0 0 28px;display:flex;flex-wrap:wrap;gap:6px 24px;font-size:15px}
 
+/* Jobs */
+.jobs-head{display:flex;flex-wrap:wrap;gap:16px 40px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
+.jobs-head p{margin:8px 0 0;color:var(--muted);max-width:560px}
+.jobs-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.jobs-bar input,.jobs-bar select{font:inherit;font-size:15px;border:1px solid #CFC8C5;border-radius:8px;padding:10px 12px;background:#fff;color:var(--text);min-height:44px}
+.jobs-bar input{flex:1 1 260px;min-width:0}
+.jobs-bar input:focus,.jobs-bar select:focus{outline:2px solid var(--red);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chip{font:inherit;font-size:13.5px;font-weight:500;border:1px solid #D9D2CF;background:#fff;color:var(--gray);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:36px}
+.chip:hover{border-color:var(--gray)}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.job-count{font-size:14px;color:var(--muted);margin:0 0 12px}
+.job-list{display:grid;gap:14px}
+.job{border:1px solid var(--line);border-radius:14px;padding:22px 24px;background:#fff;transition:box-shadow .2s,border-color .2s}
+.job:hover{border-color:#D9D2CF;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.job.flash{border-color:var(--red);box-shadow:0 0 0 2px rgba(160,26,37,.25)}
+.job-top{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
+.job h3{font-size:21px;line-height:1.25}
+.job-posted{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gray-3);white-space:nowrap}
+.job-posted.new{color:var(--red)}
+.job-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 12px;font-size:14px;color:var(--muted)}
+.job-cat{font-weight:600;color:var(--red)}
+.job-must{margin-top:-6px}
+.job-must b{color:var(--gray)}
+.job-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.job-tags span{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--soft);border:1px solid var(--line);color:var(--gray);border-radius:6px;padding:2px 8px}
+.job details{margin:0 0 14px}
+.job summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--gray);width:max-content}
+.job summary:hover{color:var(--red)}
+.job-desc{white-space:pre-line;color:var(--muted);font-size:15px;margin:10px 0 0}
+.job details h4{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--gray);margin:16px 0 6px}
+.job details ul{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+.job details li{margin:3px 0}
+.job-actions{display:flex;flex-wrap:wrap;gap:10px}
+.job-actions .btn{min-height:42px;font-size:15px}
+.jobs-empty{border:1px dashed #D9D2CF;border-radius:14px;padding:40px 24px;text-align:center;color:var(--muted)}
+.applying{display:none;align-items:center;gap:10px;justify-content:space-between;background:#FBEFF0;border:1px solid #EDC7CA;color:var(--red-dark);border-radius:10px;padding:10px 14px;font-size:14px}
+.applying.show{display:flex}
+.applying button{background:none;border:0;color:var(--red-dark);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px}
+
 /* Mobile */
 @media (max-width:600px){
   .wrap{padding:0 18px}
@@ -146,6 +186,11 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
   input,textarea,select{font-size:16px} /* stops iPhone zooming into fields */
   .foot{flex-direction:column;align-items:flex-start}
   .wa-float{right:14px;bottom:14px;width:52px;height:52px}
+  .jobs-bar select{flex:1 1 45%}
+  .jobs-bar input{font-size:16px}
+  .job{padding:18px}
+  .job h3{font-size:19px}
+  .job-actions .btn{flex:1 1 auto}
 }
 
 /* Footer */
@@ -178,6 +223,7 @@ footer{border-top:1px solid var(--line)}
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#demos">Demos</a>
+      <a href="#jobs">Jobs</a>
       <a href="#careers">Careers</a>
       <a href="#contact" class="btn btn-red">Get in Touch</a>
     </nav>
@@ -260,6 +306,31 @@ footer{border-top:1px solid var(--line)}
   </div>
 </section>
 
+<section id="jobs">
+  <div class="wrap pad">
+    <div class="jobs-head">
+      <div>
+        <p class="eyebrow">Open positions</p>
+        <h2>Current jobs</h2>
+        <p>Newest jobs first. Filter by skill, date posted or location, then apply in one step.</p>
+      </div>
+    </div>
+    <div class="jobs-bar">
+      <input type="search" id="jobQ" placeholder="Search jobs — e.g. UiPath, Python, Pune" aria-label="Search jobs">
+      <select id="jobWhen" aria-label="Date posted">
+        <option value="">Any time</option>
+        <option value="1">Last 24 hours</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+      <select id="jobLoc" aria-label="Location"><option value="">All locations</option></select>
+    </div>
+    <div class="chips" id="jobChips" role="group" aria-label="Filter by skill"></div>
+    <p class="job-count" id="jobCount" aria-live="polite"></p>
+    <div class="job-list" id="jobList"><div class="jobs-empty">Loading jobs…</div></div>
+  </div>
+</section>
+
 <section class="soft">
   <div class="wrap pad forms">
     <div id="careers" class="panel panel-light">
@@ -267,6 +338,8 @@ footer{border-top:1px solid var(--line)}
       <h2>Join the team</h2>
       <p style="margin:0 0 28px;color:var(--muted)">Send your resume and profile details using the form below.</p>
       <form id="careersForm">
+        <div class="applying" id="applyingFor" aria-live="polite"><span>Applying for: <b id="applyingTitle"></b></span><button type="button" id="applyingClear">Change</button></div>
+        <input type="hidden" name="jobId" value="">
         <div class="row2">
           <label>Full name<input type="text" name="name" required autocomplete="name"></label>
           <label>Current job title<input type="text" name="title" required placeholder="e.g. RPA Developer"></label>
@@ -462,7 +535,7 @@ footer{border-top:1px solid var(--line)}
       btn.disabled = true; btn.textContent = 'Uploading…'; note.textContent = '';
       function done(msg, ok) {
         note.textContent = msg; btn.disabled = false; btn.textContent = label;
-        if (ok) f.reset();
+        if (ok) { f.reset(); if (window.clearJobSelection) window.clearJobSelection(); }
       }
 
       if (!configured) {
@@ -489,6 +562,7 @@ footer{border-top:1px solid var(--line)}
             done('Thank you! Your application and resume have been received. We will get back to you soon.', true);
           } else {
             done('Sorry, your application could not be sent (' + ((res && res.error) || 'unknown error') + '). Please email your resume to ' + EMAIL_TO + '.');
+            if (res && /no longer open/.test(res.error || '') && window.reloadJobs) window.reloadJobs();
           }
         })
         .catch(function () {
@@ -497,6 +571,154 @@ footer{border-top:1px solid var(--line)}
             : 'Network error — please try again, or email your resume to ' + EMAIL_TO + '.');
         });
     });
+  })();
+
+  // ----- Jobs board: open jobs from your Google Sheet (newest first) -----
+  (function () {
+    var listEl = document.getElementById('jobList'), chipsEl = document.getElementById('jobChips');
+    var qEl = document.getElementById('jobQ'), whenEl = document.getElementById('jobWhen'), locEl = document.getElementById('jobLoc');
+    var countEl = document.getElementById('jobCount'), form = document.getElementById('careersForm');
+    var jobs = [], chip = '';
+    var EXP = { '0-1': 'Fresher (0–1 yr)', '1-3': '1–3 yrs', '4-6': '4–6 yrs', '7-9': '7–9 yrs', '10-14': '10–14 yrs', '15+': '15–20+ yrs' };
+    var DAY = 86400000;
+
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    function fmt(s) { return esc(s).replace(/\*([^*\n]+)\*/g, '<b>$1</b>'); }   // WhatsApp *bold* → bold
+    function list(s) { return String(s || '').split(/[,;\/\n]+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+    function ago(t) {
+      var d = Math.floor((Date.now() - t) / DAY);
+      if (d < 1) return 'Posted today';
+      if (d === 1) return 'Posted yesterday';
+      if (d < 30) return 'Posted ' + d + ' days ago';
+      return 'Posted ' + new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function hay(j) { return [j.title, j.category, j.skills, j.location, j.workMode, j.type, j.domain, j.mandatorySkill, j.salary, j.description, j.requirements, j.responsibilities, j.lookingFor].join(' ').toLowerCase(); }
+
+    function buildFilters() {
+      var count = {}, locs = {};
+      jobs.forEach(function (j) {
+        var seen = {};
+        [j.category].concat(list(j.skills), list(j.mandatorySkill)).forEach(function (t) {
+          var k = t.toLowerCase(); if (!t || seen[k]) return; seen[k] = 1;
+          count[k] = count[k] || { label: t, n: 0, cat: 0 }; count[k].n++; if (t === j.category) count[k].cat = 1;
+        });
+        list(j.location).forEach(function (l) { locs[l] = 1; });
+        if (j.workMode === 'Remote') locs.Remote = 1;
+      });
+      var tags = Object.keys(count).map(function (k) { return count[k]; })
+        .sort(function (a, b) { return (b.cat - a.cat) || (b.n - a.n) || a.label.localeCompare(b.label); }).slice(0, 14);
+      chipsEl.innerHTML = '<button type="button" class="chip" data-chip="" aria-pressed="' + (!chip) + '">All</button>' +
+        tags.map(function (t) { return '<button type="button" class="chip" data-chip="' + esc(t.label) + '" aria-pressed="' + (chip.toLowerCase() === t.label.toLowerCase()) + '">' + esc(t.label) + '</button>'; }).join('');
+      var cur = locEl.value;
+      locEl.innerHTML = '<option value="">All locations</option>' + Object.keys(locs).sort().map(function (l) { return '<option>' + esc(l) + '</option>'; }).join('');
+      locEl.value = cur;
+    }
+
+    function render() {
+      var q = qEl.value.toLowerCase().split(/[,\s]+/).filter(Boolean), when = Number(whenEl.value), loc = locEl.value;
+      var shown = jobs.filter(function (j) {
+        if (when && Date.now() - j.posted > when * DAY) return false;
+        if (loc && list(j.location).indexOf(loc) === -1 && !(loc === 'Remote' && j.workMode === 'Remote')) return false;
+        if (chip) {
+          var c = chip.toLowerCase();
+          if (j.category.toLowerCase() !== c && list(j.skills).concat(list(j.mandatorySkill)).map(function (x) { return x.toLowerCase(); }).indexOf(c) === -1) return false;
+        }
+        var h = hay(j);
+        return q.every(function (w) { return h.indexOf(w) !== -1; });
+      });
+      countEl.textContent = jobs.length ? shown.length + ' of ' + jobs.length + ' open job' + (jobs.length === 1 ? '' : 's') : '';
+      if (!jobs.length) {
+        listEl.innerHTML = '<div class="jobs-empty"><b>No open positions right now.</b><br>We are always looking for talent — <a href="#careers">send us your resume</a> and we will contact you when a matching role opens.</div>';
+        return;
+      }
+      if (!shown.length) { listEl.innerHTML = '<div class="jobs-empty">No jobs match these filters. <a href="#jobs" id="jobReset">Clear filters</a></div>'; return; }
+      listEl.innerHTML = shown.map(function (j) {
+        var meta = [];
+        if (j.category) meta.push('<span class="job-cat">' + esc(j.category) + '</span>');
+        var place = [j.location, j.workMode && String(j.location || '').toLowerCase() !== j.workMode.toLowerCase() ? j.workMode : ''].filter(Boolean);
+        if (place.length) meta.push('<span>📍 ' + esc(place.length === 2 ? place[0] + ' (' + place[1] + ')' : place[0]) + '</span>');
+        if (j.experience) meta.push('<span>💼 ' + esc(EXP[j.experience] || j.experience) + '</span>');
+        if (j.type) meta.push('<span>🕒 ' + esc(j.type) + '</span>');
+        if (j.salary) meta.push('<span>💰 ' + esc(j.salary) + '</span>');
+        if (j.openings) meta.push('<span>👥 ' + esc(j.openings) + ' opening' + (j.openings === '1' ? '' : 's') + '</span>');
+        if (j.domain) meta.push('<span>🏭 ' + esc(j.domain) + '</span>');
+        var must = [];
+        if (j.mandatorySkill) must.push('<span>⭐ <b>Mandatory:</b> ' + esc(j.mandatorySkill) + '</span>');
+        if (j.relevantExperience) must.push('<span>🔹 <b>Relevant experience:</b> ' + esc(j.relevantExperience) + '</span>');
+        var lines = function (t) { return String(t || '').split(/\n+/).map(function (x) { return x.replace(/^[\s•✅→*-]+/, '').trim(); }).filter(Boolean); };
+        var req = lines(j.requirements), resp = lines(j.responsibilities), lf = lines(j.lookingFor);
+        var ul = function (h, arr) { return arr.length ? '<h4>' + h + '</h4><ul>' + arr.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul>' : ''; };
+        var details = (j.description ? '<p class="job-desc">' + fmt(j.description) + '</p>' : '') +
+          ul('Key skills &amp; expertise', req) + ul('Key responsibilities', resp) + ul('What we are looking for', lf);
+        var tags = list(j.skills).map(function (s) { return '<span>' + esc(s) + '</span>'; }).join('');
+        var fresh = Date.now() - j.posted < 3 * DAY;
+        return '<article class="job" id="job-' + esc(j.id) + '">' +
+          '<div class="job-top"><h3>' + esc(j.title) + '</h3><span class="job-posted' + (fresh ? ' new' : '') + '" title="' + esc(new Date(j.posted).toLocaleString()) + '">' + ago(j.posted) + '</span></div>' +
+          '<div class="job-meta">' + meta.join('') + '</div>' +
+          (must.length ? '<div class="job-meta job-must">' + must.join('') + '</div>' : '') +
+          (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
+          (details ? '<details><summary>View job details</summary>' + details + '</details>' : '') +
+          '<div class="job-actions"><button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>' +
+          '<button type="button" class="btn btn-outline" data-share="' + esc(j.id) + '">Copy job link</button></div></article>';
+      }).join('');
+    }
+
+    function selectJob(j) {
+      form.elements.namedItem('jobId').value = j.id;
+      form.elements.namedItem('role').value = j.title;
+      document.getElementById('applyingTitle').textContent = j.title + (j.location ? ' · ' + j.location : '');
+      document.getElementById('applyingFor').classList.add('show');
+      document.getElementById('careers').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(function () { form.elements.namedItem('name').focus({ preventScroll: true }); }, 500);
+    }
+    window.clearJobSelection = function () {
+      form.elements.namedItem('jobId').value = '';
+      document.getElementById('applyingFor').classList.remove('show');
+    };
+    document.getElementById('applyingClear').addEventListener('click', function () {
+      window.clearJobSelection(); form.elements.namedItem('role').value = ''; form.elements.namedItem('role').focus();
+    });
+
+    listEl.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-apply]'), s = e.target.closest('[data-share]');
+      if (e.target.id === 'jobReset') { e.preventDefault(); qEl.value = ''; whenEl.value = ''; locEl.value = ''; chip = ''; buildFilters(); render(); return; }
+      if (a) { var j = jobs.find(function (x) { return x.id === a.dataset.apply; }); if (j) selectJob(j); }
+      if (s) {
+        var url = location.href.split('#')[0] + '#job-' + s.dataset.share, b = s;
+        var ok = function () { b.textContent = 'Link copied ✓'; setTimeout(function () { b.textContent = 'Copy job link'; }, 2000); };
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, function () { prompt('Copy this link:', url); });
+        else prompt('Copy this link:', url);
+      }
+    });
+    chipsEl.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-chip]'); if (!c) return;
+      chip = c.dataset.chip;
+      chipsEl.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(b === c)); });
+      render();
+    });
+    [qEl, whenEl, locEl].forEach(function (el) { el.addEventListener('input', render); });
+
+    function openFromHash() {
+      var m = location.hash.match(/^#job-(.+)$/); if (!m) return;
+      var el = document.getElementById('job-' + decodeURIComponent(m[1])); if (!el) return;
+      var d = el.querySelector('details'); if (d) d.open = true;
+      el.classList.add('flash'); el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(function () { el.classList.remove('flash'); }, 2600);
+    }
+
+    window.reloadJobs = function () {
+      if (!CAREERS_SCRIPT_URL || CAREERS_SCRIPT_URL.indexOf('PASTE') === 0) { jobs = []; buildFilters(); render(); return; }
+      fetch(CAREERS_SCRIPT_URL + '?action=jobs').then(function (r) { return r.json(); }).then(function (res) {
+        jobs = (res && res.ok && res.jobs || []).sort(function (a, b) { return b.posted - a.posted; });
+        var sel = form.elements.namedItem('jobId').value;
+        if (sel && !jobs.some(function (j) { return j.id === sel; })) window.clearJobSelection();
+        buildFilters(); render(); openFromHash();
+      }).catch(function () {
+        listEl.innerHTML = '<div class="jobs-empty">Jobs could not be loaded right now. Please refresh the page, or <a href="#careers">send us your resume</a>.</div>';
+      });
+    };
+    window.addEventListener('hashchange', openFromHash);
+    window.reloadJobs();
   })();
 
   function toggleMenu(btn) {

@@ -125,7 +125,77 @@ form.f{display:flex;flex-direction:column;gap:14px}
   .dlg-head,.dlg-body,.dlg-foot{padding-left:16px;padding-right:16px}
   .dlg-foot .btn{flex:1 1 45%}
   .f input,.f textarea,.f select{font-size:16px}
+  .tabs button{flex:1 1 50%;justify-content:center;padding:10px 6px;font-size:14px}
+  .top-actions{width:100%}
+  .top-actions .btn{flex:1 1 auto}
+  .jcard{padding:16px}
+  .jcard .cand-actions .btn{flex:1 1 auto}
+  .app-actions{width:100%}
+  .app-actions .btn{flex:1 1 auto}
+  .app-bar .opt{margin-left:0;width:100%}
 }
+/* View tabs */
+.tabs{display:flex;gap:6px;margin-top:20px;border-bottom:1px solid var(--line)}
+.tabs button{font:inherit;font-size:15px;font-weight:600;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--red);border-bottom-color:var(--red)}
+.badge{background:var(--red);color:#fff;border-radius:999px;font-size:11.5px;font-weight:700;min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center}
+.badge:empty{display:none}
+body[data-view="jobs"] .bench-only{display:none!important}
+body:not([data-view="jobs"]) .jobs-only{display:none!important}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Jobs admin */
+.jlist{display:grid;gap:12px;padding:8px 0 80px}
+.jcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.jcard.closed{background:#FBFAF9}
+.jcard.closed h3{color:#8A8A8F}
+.jtop{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.jtop h3{font-size:19px;line-height:1.25}
+.jmeta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:4px}
+.jmeta .cat{color:var(--red);font-weight:600}
+.pill{font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pill.open{background:#E3F4EA;color:#17663A}
+.pill.closed{background:#EEEDEC;color:#6A6A6F}
+.pill.New{background:#FFF3D6;color:#7A5300}
+.pill.Shortlisted{background:#E3F4EA;color:#17663A}
+.pill.Rejected{background:#F6E1E3;color:#8C1C26}
+.jstats{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13.5px;color:var(--muted)}
+.jstats b{color:var(--text)}
+.jstats .hot{color:#7A5300;font-weight:600}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+
+dialog.wide{width:min(900px,94vw)}
+.row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.section-label{margin:6px 0 -4px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--red)}
+.paste-box{border:1px solid #D8E6DC;background:#F4FBF6;border-radius:10px;padding:10px 14px}
+.paste-box summary{cursor:pointer;font-weight:600;font-size:14px;color:#17663A}
+.paste-box textarea{margin:10px 0 8px;font-size:13.5px}
+.private-box{border:1px dashed #E3BFC2;background:#FDF7F7;border-radius:10px;padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:12px}
+.private-box legend{font-size:13px;font-weight:600;color:var(--red-dark);padding:0 6px}
+.wa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:16px}
+.wa-col{display:flex;flex-direction:column;gap:8px}
+.wa-col h3{font-size:17px;display:flex;align-items:center;gap:8px}
+.wa-col textarea{width:100%;min-height:360px;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13.5px;line-height:1.5;border:1px solid #CFC8C5;border-radius:8px;padding:10px 12px;background:#F4FBF6;color:var(--text);resize:vertical}
+.wa-col .row{display:flex;gap:6px;flex-wrap:wrap}
+.wa-warn{font-size:12.5px;color:#8C1C26;margin:0}
+.wa-opts{display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.wa-opts input[type=text]{font:inherit;font-size:14px;border:1px solid #CFC8C5;border-radius:8px;padding:8px 10px;width:100%}
+.app-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.app-bar .chip{font:inherit;font-size:13px;font-weight:500;border:1px solid #D9D2CF;background:#fff;color:var(--gray);border-radius:999px;padding:6px 12px;cursor:pointer}
+.app-bar .chip[aria-pressed="true"]{background:var(--gray);border-color:var(--gray);color:#fff}
+.app-bar .opt{margin:0 0 0 auto;font-size:13.5px}
+.apps{display:grid;gap:10px}
+.app{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;background:#fff}
+.app.Shortlisted{border-left:4px solid var(--green)}
+.app.Rejected{border-left:4px solid #C9A9AC;background:#FCFAFA}
+.app-main{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.app-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.app-name b{font-family:'Outfit',sans-serif;font-size:18px;font-weight:600;color:var(--gray)}
+.app-msg{font-size:13px;color:var(--muted);white-space:pre-wrap;margin:0;background:var(--soft);border-radius:8px;padding:8px 10px}
+.app-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn-ok{background:var(--green);color:#fff}.btn-ok:hover:not(:disabled){background:#18733E}
+.btn-no{background:#fff;color:var(--red);border:1px solid #E3BFC2}.btn-no:hover:not(:disabled){border-color:var(--red)}
+
 .privacy{font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;padding:10px 14px;margin:0 0 4px}
 </style>
 </head>
@@ -138,16 +208,23 @@ form.f{display:flex;flex-direction:column;gap:14px}
       <div class="logo-name">Bas<span>Man</span></div>
     </a>
     <div class="head-actions">
-      <button class="btn btn-outline btn-sm" id="syncBtn" title="Import new applicants from your Google Drive">☁ Sync applicants</button>
-      <button class="btn btn-outline btn-sm" id="syncSetBtn" title="Google Drive sync settings" aria-label="Sync settings">⚙</button>
-      <button class="btn btn-outline btn-sm" id="exportBtn" title="Download a backup file of all candidates and resumes">⬇ Backup</button>
-      <label class="btn btn-outline btn-sm" title="Restore candidates from a backup file">⬆ Restore<input type="file" id="importFile" accept=".json,application/json" hidden></label>
-      <button class="btn btn-red" id="addBtn">+ Add candidate</button>
+      <button class="btn btn-outline btn-sm bench-only" id="syncBtn" title="Import new applicants from your Google Drive">☁ Sync applicants</button>
+      <button class="btn btn-outline btn-sm" id="syncSetBtn" title="Google Drive sync settings" aria-label="Google Drive settings">⚙ Settings</button>
+      <button class="btn btn-outline btn-sm bench-only" id="exportBtn" title="Download a backup file of all candidates and resumes">⬇ Backup</button>
+      <label class="btn btn-outline btn-sm bench-only" title="Restore candidates from a backup file">⬆ Restore<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+      <button class="btn btn-red bench-only" id="addBtn">+ Add candidate</button>
+      <button class="btn btn-red jobs-only" id="postJobBtn">+ Post job</button>
     </div>
   </div>
 </header>
 
 <main class="wrap">
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-view="bench" aria-selected="true">Candidate bench</button>
+    <button type="button" role="tab" data-view="jobs" aria-selected="false">Jobs &amp; applications <span class="badge" id="newBadge" title="New applications waiting for review"></span></button>
+  </nav>
+
+  <section class="bench-only">
   <div class="top">
     <div>
       <p class="eyebrow">Private · Talent bench</p>
@@ -185,6 +262,22 @@ form.f{display:flex;flex-direction:column;gap:14px}
   </div>
 
   <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="jobs-only" id="viewJobs">
+    <div class="top">
+      <div>
+        <p class="eyebrow">Private · Hiring</p>
+        <h1>Jobs &amp; applications</h1>
+        <p>Jobs you post appear on your website's Jobs section. Approve or reject each applicant here.</p>
+      </div>
+      <div class="top-actions">
+        <label class="btn btn-outline btn-sm" title="Post several jobs at once from a .json file">⬆ Import jobs<input type="file" id="importJobs" accept=".json,application/json" hidden></label>
+        <button class="btn btn-outline btn-sm" id="jobsRefresh">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="jlist" id="jobsAdmin"><div class="loading">Loading…</div></div>
+  </section>
 </main>
 
 <!-- Add / edit dialog -->
@@ -261,6 +354,132 @@ form.f{display:flex;flex-direction:column;gap:14px}
       <button type="submit" class="btn btn-red">Save &amp; sync now</button>
     </div>
   </form>
+</dialog>
+
+<!-- Post / edit job -->
+<dialog id="jobDlg" class="wide">
+  <form class="f" id="jobForm" method="dialog">
+    <div class="dlg-head"><h2 id="jobDlgTitle">Post a job</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dlg-body">
+      <div class="f" style="gap:14px">
+        <details class="paste-box" id="pasteBox" open>
+          <summary>📋 Paste a recruiter post to fill this form automatically</summary>
+          <textarea id="pasteText" rows="6" placeholder="Paste the full job post from LinkedIn, WhatsApp or email here…"></textarea>
+          <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button type="button" class="btn btn-gray btn-sm" id="pasteFill">✨ Fill form from post</button>
+            <span class="hint" id="pasteNote">Check every field after filling — then add anything missing.</span>
+          </div>
+        </details>
+
+        <p class="section-label">Job basics — shown on website &amp; both WhatsApp posts</p>
+        <label>Job title <span class="req">*</span><input name="title" required placeholder="e.g. Senior RPA Developer"></label>
+        <div class="row3">
+          <label>Category <span class="req">*</span><input name="category" list="catList" required placeholder="e.g. RPA"></label>
+          <label>Location<input name="location" list="locList" placeholder="e.g. Mumbai"></label>
+          <label>Work mode<select name="workMode"><option value="">—</option><option>On-site</option><option>Hybrid</option><option>Remote</option></select></label>
+        </div>
+        <div class="row3">
+          <label>Experience<input name="experience" list="expList" placeholder="e.g. 8–10 Years (Overall IT)"></label>
+          <label>Relevant experience<input name="relevantExperience" placeholder="e.g. 5+ Years RPA"></label>
+          <label>Mandatory skill<input name="mandatorySkill" placeholder="e.g. Blue Prism"></label>
+        </div>
+        <div class="row3">
+          <label>Employment type<select name="type">
+            <option value="">—</option><option>Full-Time</option><option>Contract</option><option>C2H (Contract-to-hire)</option>
+            <option>Part-Time</option><option>Internship</option><option>Freelance</option>
+          </select></label>
+          <label>Openings<input name="openings" inputmode="numeric" placeholder="e.g. 2"></label>
+          <label>Salary<input name="salary" placeholder="e.g. Up to ₹25 LPA"></label>
+        </div>
+        <label>Domain<input name="domain" placeholder="e.g. Plant Operations | Industrial Automation"></label>
+        <label>Skill tags <span class="hint">— comma separated; these become the filter buttons on your website</span><input name="skills" placeholder="Blue Prism, Automation Anywhere, Power Automate"></label>
+
+        <p class="section-label">Job details — one item per line</p>
+        <label>Intro <span class="hint">— 1–3 sentences; keep it generic, no company name</span><textarea name="description" rows="3" placeholder="Looking for an experienced Senior RPA Developer with strong hands-on Blue Prism expertise…"></textarea></label>
+        <div class="row2">
+          <label>Key skills &amp; expertise <span class="hint">(✅)</span><textarea name="requirements" rows="5" placeholder="Blue Prism (Mandatory)&#10;Automation Anywhere"></textarea></label>
+          <label>Key responsibilities <span class="hint">(→)</span><textarea name="responsibilities" rows="5" placeholder="Design &amp; build automated workflows&#10;Maintain bots"></textarea></label>
+        </div>
+        <label>What we're looking for <span class="hint">(🔸)</span><textarea name="lookingFor" rows="3" placeholder="8–10 years of overall IT experience&#10;Minimum 5+ years of hands-on RPA development"></textarea></label>
+
+        <fieldset class="private-box">
+          <legend>🔒 Private — Premium posts only, never shown on the website or free posts</legend>
+          <div class="row2">
+            <label>Client company<input name="company" placeholder="e.g. Baellchen Technology"></label>
+            <label>Company tagline<input name="companyAbout" placeholder="Driving Transformation Through Technology"></label>
+          </div>
+          <label>Posted by <span class="hint">— recruiter name &amp; agency</span><input name="postedBy" placeholder="e.g. Rithvika Banavath (Nethra Recruitment Solutions)"></label>
+          <div class="row3">
+            <label>Apply email<input name="applyEmail" type="email" placeholder="hr@company.com"></label>
+            <label>Apply on WhatsApp<input name="applyWhatsapp" type="tel" placeholder="e.g. 9494752225"></label>
+            <label>Contact phone<input name="contactPhone" type="tel" placeholder="+91 …"></label>
+          </div>
+          <div class="row2">
+            <label>How to apply <span class="hint">— optional note</span><input name="howToApply" placeholder="e.g. DM the recruiter on LinkedIn with your updated resume"></label>
+            <label>Company website<input name="companyWebsite" placeholder="www.company.com"></label>
+          </div>
+        </fieldset>
+        <label>Status<select name="status"><option value="Open">Open — visible on website</option><option value="Closed">Closed — hidden from website (WhatsApp posts still work)</option></select></label>
+      </div>
+      <datalist id="catList">
+        <option>RPA</option><option>UiPath</option><option>Automation Anywhere</option><option>Power Automate</option><option>Blue Prism</option>
+        <option>App Development</option><option>AI / ML</option><option>GenAI</option><option>Data Engineering</option><option>Python</option>
+        <option>Java</option><option>.NET</option><option>Full-Stack</option><option>Cloud &amp; DevOps</option><option>SAP</option>
+        <option>Salesforce</option><option>ServiceNow</option><option>QA Automation</option>
+      </datalist>
+      <datalist id="locList">
+        <option>Remote</option><option>Bengaluru</option><option>Hyderabad</option><option>Pune</option><option>Chennai</option>
+        <option>Mumbai</option><option>NCR</option><option>Kuwait</option>
+      </datalist>
+      <datalist id="expList">
+        <option>Fresher (0–1 Year)</option><option>1–3 Years</option><option>3–4 Years</option><option>3–5 Years</option>
+        <option>4–6 Years</option><option>5–8 Years</option><option>7–9 Years</option><option>8–10 Years</option><option>10–14 Years</option><option>15+ Years</option>
+      </datalist>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-outline" data-close>Cancel</button>
+      <button type="submit" class="btn btn-red" id="jobSaveBtn">Post job</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- WhatsApp posts -->
+<dialog id="waDlg" class="wide">
+  <div class="dlg-head"><h2 id="waTitle">WhatsApp posts</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <div class="wa-grid">
+      <div class="wa-col">
+        <h3>👥 Free group <span class="hint">— company &amp; contact hidden</span></h3>
+        <div class="wa-opts">
+          <label class="opt" style="margin:0"><input type="checkbox" id="waSiteLink"> Let free members apply on our website (adds job link)</label>
+          <label>How to join Premium <span class="hint">(optional — link or number, remembered)</span><input type="text" id="waJoin" placeholder="e.g. https://chat.whatsapp.com/… or WhatsApp +965 6586 1821"></label>
+        </div>
+        <textarea id="waFree" aria-label="Free group post"></textarea>
+        <div class="row"><button class="btn btn-outline btn-sm" data-wa-copy="waFree">Copy</button><button class="btn btn-green btn-sm" data-wa-open="waFree">Open in WhatsApp</button></div>
+      </div>
+      <div class="wa-col">
+        <h3>💎 Premium group <span class="hint">— full details</span></h3>
+        <p class="wa-warn" id="waWarn"></p>
+        <textarea id="waPrem" aria-label="Premium group post"></textarea>
+        <div class="row"><button class="btn btn-outline btn-sm" data-wa-copy="waPrem">Copy</button><button class="btn btn-green btn-sm" data-wa-open="waPrem">Open in WhatsApp</button></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Applicants for a job -->
+<dialog id="appsDlg" class="wide">
+  <div class="dlg-head"><h2 id="appsTitle">Applicants</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+  <div class="dlg-body">
+    <div class="app-bar" id="appsBar">
+      <button type="button" class="chip" data-st="" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-st="New" aria-pressed="false">New</button>
+      <button type="button" class="chip" data-st="Shortlisted" aria-pressed="false">Approved</button>
+      <button type="button" class="chip" data-st="Rejected" aria-pressed="false">Rejected</button>
+      <label class="opt"><input type="checkbox" id="notifyOnApprove" checked> Email candidate when I approve</label>
+    </div>
+    <div class="apps" id="appsList"></div>
+  </div>
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -582,7 +801,7 @@ form.f{display:flex;flex-direction:column;gap:14px}
             resume = { name: f.name, type: f.type, blob: await (await fetch('data:' + f.type + ';base64,' + f.data)).blob() };
           } catch (e) { console.warn('Resume download failed for', a.name, e); }
         }
-        var notes = ['Applied for: ' + a.role + ' (website, ' + new Date(a.submitted).toLocaleDateString() + ')'];
+        var notes = ['Applied for: ' + (a.jobTitle || a.role) + ' (website, ' + new Date(a.submitted).toLocaleDateString() + ')'];
         if (a.message) notes.push(a.message);
         if (a.resumeId && !resume && a.resumeUrl) notes.push('Resume in Drive: ' + a.resumeUrl);
         await put({
@@ -613,9 +832,480 @@ form.f{display:flex;flex-direction:column;gap:14px}
   syncForm.addEventListener('submit', function (e) {
     e.preventDefault();
     var cfg = { url: syncForm.elements.namedItem('url').value.trim(), key: syncForm.elements.namedItem('key').value.trim() };
-    setSync(cfg); syncDlg.close(); runSync(cfg);
+    setSync(cfg); syncDlg.close();
+    if (document.body.dataset.view === 'jobs') loadJobs(); else runSync(cfg);
   });
   $('syncForget').addEventListener('click', function () { setSync(null); syncDlg.close(); toast('Sync settings removed from this device'); });
+
+  // ===== Jobs & applications (live from your Google Sheet) =====
+  var J = { jobs: [], apps: [], loaded: false, jobId: null, st: '' };
+  var EXP_JOB = { '0-1': 'Fresher (0–1 Year)', '1-3': '1–3 Years', '4-6': '4–6 Years', '7-9': '7–9 Years', '10-14': '10–14 Years', '15+': '15–20+ Years' };
+  var jobDlg = $('jobDlg'), jobForm = $('jobForm'), appsDlg = $('appsDlg');
+  function JF(n) { return jobForm.elements.namedItem(n); }
+  var JOB_FIELDS = ['title', 'category', 'skills', 'location', 'experience', 'type', 'description', 'status', 'domain',
+                    'requirements', 'responsibilities', 'company', 'companyAbout', 'applyEmail', 'contactPhone', 'companyWebsite',
+                    'workMode', 'relevantExperience', 'mandatorySkill', 'openings', 'salary', 'lookingFor',
+                    'postedBy', 'applyWhatsapp', 'howToApply'];
+  function fmtDate(t) { return t ? new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; }
+
+  function apiPost(cfg, body) {
+    body.key = cfg.key;
+    return fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) { if (!res || !res.ok) throw new Error(res && res.error === 'unauthorized' ? 'wrong admin key' : (res && res.error) || 'bad response'); return res; });
+  }
+  function needCfg() {
+    var cfg = getSync();
+    if (!cfg) { openSyncSettings(); toast('Connect your Google Drive first (URL + admin key)'); }
+    return cfg;
+  }
+
+  async function loadJobs(quiet) {
+    var cfg = getSync(), box = $('jobsAdmin');
+    if (!cfg) {
+      box.innerHTML = '<div class="empty"><h2>Connect Google Drive</h2><p>Jobs and applications live in your Google Sheet. Add your Web app URL and admin key once.</p><button class="btn btn-red" id="jobsConnect">Connect</button></div>';
+      return;
+    }
+    if (!quiet) box.innerHTML = '<div class="loading">Loading jobs and applications…</div>';
+    try {
+      var res = await Promise.all([api(cfg, { action: 'alljobs' }), api(cfg, { action: 'list' })]);
+      J.jobs = res[0].jobs || []; J.apps = res[1].candidates || []; J.loaded = true;
+      renderJobs(); if (appsDlg.open) renderApps();
+    } catch (err) {
+      box.innerHTML = '<div class="empty"><h2>Could not load</h2><p>' + esc(err && err.message || err) +
+        '. If you just updated the Google script, publish a <b>New version</b> under Deploy → Manage deployments.</p><button class="btn btn-outline" id="jobsRetry">Try again</button></div>';
+    }
+  }
+
+  function appsFor(jobId) { return J.apps.filter(function (a) { return (a.jobId || '') === (jobId || ''); }); }
+  function counts(list) {
+    var c = { New: 0, Shortlisted: 0, Rejected: 0 };
+    list.forEach(function (a) { c[a.status] = (c[a.status] || 0) + 1; });
+    return c;
+  }
+  function updateBadge() {
+    var n = J.apps.filter(function (a) { return a.status === 'New'; }).length;
+    $('newBadge').textContent = n ? String(n) : '';
+  }
+
+  function jobLink(id) { return new URL('index.html#job-' + encodeURIComponent(id), location.href).href; }
+
+  function renderJobs() {
+    updateBadge();
+    var box = $('jobsAdmin');
+    var jobs = J.jobs.slice().sort(function (a, b) { return (a.status === 'Open' ? 0 : 1) - (b.status === 'Open' ? 0 : 1) || b.posted - a.posted; });
+    var html = jobs.map(function (j) {
+      var list = appsFor(j.id), c = counts(list), open = j.status === 'Open';
+      var meta = [];
+      if (j.category) meta.push('<span class="cat">' + esc(j.category) + '</span>');
+      if (j.location) meta.push('<span>📍 ' + esc(j.location) + '</span>');
+      if (j.experience) meta.push('<span>💼 ' + esc(EXP_JOB[j.experience] || j.experience) + '</span>');
+      if (j.workMode) meta.push('<span>🏠 ' + esc(j.workMode) + '</span>');
+      if (j.salary) meta.push('<span>💰 ' + esc(j.salary) + '</span>');
+      if (j.type) meta.push('<span>🕒 ' + esc(j.type) + '</span>');
+      if (j.company) meta.push('<span title="Private — only in Premium posts">🔒 ' + esc(j.company) + '</span>');
+      meta.push('<span>ID ' + esc(j.id) + '</span>');
+      return '<article class="jcard' + (open ? '' : ' closed') + '">' +
+        '<div class="jtop"><div style="min-width:0"><h3>' + esc(j.title) + '</h3><div class="jmeta">' + meta.join('') + '</div></div>' +
+        '<span class="pill ' + (open ? 'open' : 'closed') + '">' + (open ? 'Open' : 'Closed') + '</span></div>' +
+        '<div class="jstats"><span><b>' + list.length + '</b> applicant' + (list.length === 1 ? '' : 's') + '</span>' +
+          (c.New ? '<span class="hot">' + c.New + ' waiting for review</span>' : '') +
+          '<span>' + c.Shortlisted + ' approved</span><span>' + c.Rejected + ' rejected</span>' +
+          '<span>Posted ' + fmtDate(j.posted) + '</span></div>' +
+        '<div class="cand-actions">' +
+          '<button class="btn btn-gray btn-sm" data-jact="apps" data-id="' + esc(j.id) + '">Review applicants (' + list.length + ')</button>' +
+          '<button class="btn btn-outline btn-sm" data-jact="edit" data-id="' + esc(j.id) + '">Edit</button>' +
+          '<button class="btn btn-outline btn-sm" data-jact="toggle" data-id="' + esc(j.id) + '">' + (open ? 'Close job' : 'Reopen') + '</button>' +
+          '<button class="btn btn-green btn-sm" data-jact="wa" data-id="' + esc(j.id) + '">📱 WhatsApp post</button>' +
+          (open ? '<button class="btn btn-outline btn-sm" data-jact="link" data-id="' + esc(j.id) + '">Copy job link</button>' : '') +
+          '<button class="btn btn-outline btn-sm" data-jact="del" data-id="' + esc(j.id) + '" style="margin-left:auto;color:var(--red)">Delete</button>' +
+        '</div></article>';
+    }).join('');
+
+    var general = appsFor('');
+    if (general.length) {
+      var g = counts(general);
+      html += '<article class="jcard"><div class="jtop"><div><h3>General applications</h3><div class="jmeta"><span>Sent from the Careers form without choosing a job</span></div></div></div>' +
+        '<div class="jstats"><span><b>' + general.length + '</b> applicant' + (general.length === 1 ? '' : 's') + '</span>' +
+        (g.New ? '<span class="hot">' + g.New + ' waiting for review</span>' : '') + '<span>' + g.Shortlisted + ' approved</span><span>' + g.Rejected + ' rejected</span></div>' +
+        '<div class="cand-actions"><button class="btn btn-gray btn-sm" data-jact="apps" data-id="">Review applicants (' + general.length + ')</button></div></article>';
+    }
+    if (!html) html = '<div class="empty"><h2>No jobs yet</h2><p>Post your first job — it appears on your website straight away.</p><button class="btn btn-red" data-jact="new">+ Post job</button></div>';
+    box.innerHTML = html;
+  }
+
+  function setField(k, v) {
+    var el = JF(k); if (!el) return false;
+    v = String(v == null ? '' : v);
+    if (el.tagName === 'SELECT') {
+      var hit = Array.prototype.find.call(el.options, function (o) { return o.value.toLowerCase() === v.toLowerCase() || o.text.toLowerCase() === v.toLowerCase(); });
+      if (!hit && v) { var o = document.createElement('option'); o.textContent = v; el.appendChild(o); hit = o; }
+      el.value = hit ? hit.value : '';
+    } else el.value = v;
+    return !!v;
+  }
+  function fillJobForm(j, all) {
+    var n = 0;
+    JOB_FIELDS.forEach(function (k) { if (all || (j[k] != null && j[k] !== '')) { if (k === 'experience') j[k] = EXP_JOB[j[k]] || j[k]; if (setField(k, j[k])) n++; } });
+    return n;
+  }
+
+  function openJobForm(j) {
+    jobForm.reset();
+    jobForm.dataset.id = j ? j.id : '';
+    $('jobDlgTitle').textContent = j ? 'Edit job' : 'Post a job';
+    $('pasteBox').open = !j; $('pasteText').value = '';
+    $('pasteNote').textContent = 'Check every field after filling — then add anything missing.';
+    $('jobSaveBtn').textContent = j ? 'Save changes' : 'Post job';
+    if (j) fillJobForm(j, true);
+    jobDlg.showModal(); JF('title').focus();
+  }
+
+  jobForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var cfg = needCfg(); if (!cfg) return;
+    var btn = $('jobSaveBtn'), label = btn.textContent, id = jobForm.dataset.id;
+    var job = { id: id || undefined };
+    JOB_FIELDS.forEach(function (k) { job[k] = JF(k).value.trim(); });
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      var res = await apiPost(cfg, { action: 'saveJob', job: job });
+      var i = J.jobs.findIndex(function (x) { return x.id === res.job.id; });
+      if (i === -1) J.jobs.unshift(res.job); else J.jobs[i] = res.job;
+      jobDlg.close(); renderJobs();
+      toast(id ? 'Job updated' : (res.job.status === 'Open' ? 'Job posted — live on your website. Here are your WhatsApp posts.' : 'Job saved as Closed — here are your WhatsApp posts.'));
+      if (!id) openWa(res.job);
+    } catch (err) { toast('Could not save job — ' + (err && err.message || err)); }
+    finally { btn.disabled = false; btn.textContent = label; }
+  });
+
+  $('jobsAdmin').addEventListener('click', async function (e) {
+    if (e.target.id === 'jobsConnect') { openSyncSettings(); return; }
+    if (e.target.id === 'jobsRetry') { loadJobs(); return; }
+    var b = e.target.closest('[data-jact]'); if (!b) return;
+    var act = b.dataset.jact, j = J.jobs.find(function (x) { return x.id === b.dataset.id; });
+    if (act === 'new') return openJobForm(null);
+    if (act === 'apps') return openApps(b.dataset.id);
+    if (!j) return;
+    if (act === 'edit') return openJobForm(j);
+    if (act === 'wa') return openWa(j);
+    if (act === 'link') {
+      var url = jobLink(j.id);
+      navigator.clipboard.writeText(url).then(function () { toast('Job link copied — paste it on LinkedIn or WhatsApp'); }, function () { prompt('Copy this link:', url); });
+      return;
+    }
+    var cfg = needCfg(); if (!cfg) return;
+    if (act === 'toggle') {
+      b.disabled = true;
+      try {
+        var res = await apiPost(cfg, { action: 'saveJob', job: Object.assign({}, j, { status: j.status === 'Open' ? 'Closed' : 'Open' }) });
+        J.jobs[J.jobs.indexOf(j)] = res.job; renderJobs();
+        toast(res.job.status === 'Open' ? 'Job reopened — visible on website' : 'Job closed — hidden from website');
+      } catch (err) { b.disabled = false; toast('Failed — ' + (err && err.message || err)); }
+    }
+    if (act === 'del') {
+      var n = appsFor(j.id).length;
+      if (!confirm('Delete "' + j.title + '"?' + (n ? '\n\nIts ' + n + ' application(s) stay in your Google Sheet.' : '') + '\n\nTip: use "Close job" instead to hide it but keep it.')) return;
+      b.disabled = true;
+      try { await apiPost(cfg, { action: 'deleteJob', id: j.id }); J.jobs.splice(J.jobs.indexOf(j), 1); renderJobs(); toast('Job deleted'); }
+      catch (err) { b.disabled = false; toast('Failed — ' + (err && err.message || err)); }
+    }
+  });
+
+  // ----- WhatsApp posts (free = company/contact hidden, premium = full) -----
+  var waDlg = $('waDlg'), waJob = null;
+  try { $('waJoin').value = localStorage.getItem('basman-wa-join') || ''; } catch (e) {}
+  function waLines(t) { return String(t || '').split(/\n+/).map(function (x) { return x.replace(/^[\s•✅→*-]+/, '').trim(); }).filter(Boolean); }
+  function hideCompany(t, j) {
+    t = String(t || '');
+    if (j.company && j.company.length > 1) t = t.split(new RegExp(j.company.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')).join('our client').replace(/(^|[.!?]\s+)our client/g, '$1Our client');
+    return t.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '').replace(/\b(https?:\/\/|www\.)\S+/gi, '')
+      .replace(/\+?\d[\d\s().-]{6,}\d/g, function (m) { var n = m.replace(/\D/g, '').length; return (n >= 9 && n <= 15) || (m.charAt(0) === '+' && n >= 8) ? '' : m; });
+  }
+  // One template for every job. Sections appear only when the field is filled.
+  function waText(j, premium) {
+    var P = function (t) { return premium ? String(t || '').trim() : hideCompany(t, j).trim(); };
+    var L = [], add = function () { for (var i = 0; i < arguments.length; i++) L.push(arguments[i]); };
+    var exp = EXP_JOB[j.experience] || j.experience;
+    var loc = [j.location, j.workMode && (j.location || '').toLowerCase() !== j.workMode.toLowerCase() ? j.workMode : ''].filter(Boolean);
+
+    add('🚀 *WE ARE HIRING | ' + P(j.title) + '*', '');
+    if (premium && (j.company || j.postedBy)) {
+      if (j.company) add(j.companyAbout ? '🏢 *' + j.company + '*: ' + j.companyAbout : '🏢 Company: *' + j.company + '*');
+      if (j.postedBy) add('👤 Posted by: ' + j.postedBy);
+      add('');
+    }
+    var ov = [];
+    if (loc.length) ov.push('📍 Location: ' + (loc.length === 2 ? loc[0] + ' (' + loc[1] + ')' : loc[0]));
+    if (exp) ov.push('💼 Experience: ' + exp);
+    if (j.relevantExperience) ov.push('🔹 Relevant Experience: ' + P(j.relevantExperience));
+    if (j.mandatorySkill) ov.push('⭐ *Mandatory Skill: ' + P(j.mandatorySkill) + '*');
+    if (j.type) ov.push('🕒 Employment Type: ' + j.type);
+    if (j.domain) ov.push('🏭 Domain: ' + P(j.domain));
+    if (j.openings) ov.push('👥 Openings: ' + j.openings);
+    if (j.salary) ov.push('💰 Salary: ' + P(j.salary));
+    if (ov.length) add.apply(null, ov.concat(['']));
+
+    if (j.description) add(P(j.description), '');
+
+    var req = waLines(P(j.requirements)); if (!req.length) req = splitSkills(P(j.skills));
+    if (req.length) { add('*🔹 Key Skills & Technical Expertise:*'); req.forEach(function (x) { add('✅ ' + x); }); add(''); }
+    var resp = waLines(P(j.responsibilities));
+    if (resp.length) { add('*🎯 Key Responsibilities:*'); resp.forEach(function (x) { add('→ ' + x); }); add(''); }
+    var lf = waLines(P(j.lookingFor));
+    if (lf.length) { add("*🔸 What We're Looking For:*"); lf.forEach(function (x) { add('🔸 ' + x); }); add(''); }
+
+    if (premium) {
+      var ap = [];
+      if (j.applyEmail) ap.push('📩 *Apply Now:* ' + j.applyEmail);
+      if (j.applyWhatsapp) ap.push('📱 *Apply via WhatsApp:* ' + j.applyWhatsapp + ' (share your updated CV)');
+      if (j.contactPhone) ap.push('📞 *Contact:* ' + j.contactPhone);
+      if (j.howToApply) ap.push('💬 *How to Apply:* ' + j.howToApply);
+      if (j.companyWebsite) ap.push('🌐 *Website:* ' + j.companyWebsite);
+      if (ap.length) add.apply(null, ap.concat(['']));
+      add('🙏 *Thank you for being a valued Premium Member!*', 'Wishing you all the best in your job search. Keep watching this group for more exclusive openings! 💼✨');
+    } else {
+      var join = $('waJoin').value.trim();
+      if ($('waSiteLink').checked) add('👉 *Apply here:* ' + jobLink(j.id), '', '🔒 Company name & HR contact are shared only in our *Premium Group* 💎');
+      else add('🔒 *Want to apply?*', 'Contact details & application link are shared only in our *Premium Group* 💎');
+      add('', '👉 *Join our Premium Group for more info!*' + (join ? '\n' + join : ''), '',
+          '🙏 *Thank you for being part of our community!*', 'Stay connected for more job updates. All the best! 💼✨');
+    }
+    return L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function fillWa() {
+    $('waFree').value = waText(waJob, false);
+    $('waPrem').value = waText(waJob, true);
+    var miss = [];
+    if (!waJob.applyEmail && !waJob.contactPhone && !waJob.applyWhatsapp && !waJob.howToApply) miss.push('how to apply (email, WhatsApp, phone or a note)');
+    if (!waJob.company && !waJob.postedBy) miss.push('client company or recruiter name');
+    $('waWarn').textContent = miss.length ? '⚠ Premium members need the ' + miss.join(' and ') + ' — add it under Edit job → 🔒 Private.' : '';
+  }
+  function openWa(j) { waJob = j; $('waTitle').textContent = 'WhatsApp posts — ' + j.title; fillWa(); waDlg.showModal(); }
+  $('waSiteLink').addEventListener('change', fillWa);
+  $('waJoin').addEventListener('input', function () { try { localStorage.setItem('basman-wa-join', $('waJoin').value); } catch (e) {} fillWa(); });
+  waDlg.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-wa-copy]'), o = e.target.closest('[data-wa-open]');
+    if (c) { var t = $(c.dataset.waCopy).value; navigator.clipboard.writeText(t).then(function () { toast('Copied — paste it in your WhatsApp group'); }, function () { $(c.dataset.waCopy).select(); document.execCommand('copy'); toast('Copied'); }); }
+    if (o) window.open('https://wa.me/?text=' + encodeURIComponent($(o.dataset.waOpen).value), '_blank', 'noopener');
+  });
+
+  // ----- Paste a recruiter post → fill the form -----
+  var TOOLS = ['RPA', 'UiPath', 'Blue Prism', 'Automation Anywhere', 'Power Automate', 'Power Apps', 'Python', 'Java', '.NET', 'C#', 'SQL', 'Excel', 'VBA',
+    'SAP', 'Salesforce', 'ServiceNow', 'Selenium', 'Playwright', 'React', 'Angular', 'Node.js', 'AWS', 'Azure', 'GCP', 'DevOps', 'Kubernetes',
+    'Docker', 'Kotlin', 'Flutter', 'Swift', 'Android', 'iOS', 'GenAI', 'LLM', 'Machine Learning', 'Power BI', 'Tableau', 'Snowflake', 'Databricks', 'Spark', 'Orchestrator', 'Document Understanding', 'A360'];
+  var RPA_TOOLS = /uipath|blue prism|automation anywhere|power automate|\brpa\b|a360/i;
+
+  function parsePost(raw) {
+    var j = {}, lines = String(raw || '').replace(/\r/g, '').split('\n');
+    var strip = function (l) { return l.replace(/[*_~`]/g, '').replace(/^[^\p{L}\p{N}(₹$]+/u, '').replace(/\s+/g, ' ').trim(); };
+    var clean = lines.map(strip);
+    var text = clean.join('\n');
+    var used = {};
+    var label = function (re) {
+      for (var i = 0; i < clean.length; i++) {
+        var m = clean[i].match(new RegExp('^(?:' + re + ')\\s*(?:[:\\-–—|]\\s*)(.+)$', 'i'));
+        if (m) { used[i] = 1; return m[1].trim(); }
+      }
+      return '';
+    };
+
+    // Title
+    for (var i = 0; i < clean.length && !j.title; i++) {
+      var m = clean[i].match(/hiring\s*(?:[|:\-–—!]+\s*)+(.+)$/i);
+      if (m && !/^(for|now)$/i.test(m[1])) { j.title = m[1].replace(/[!🚀🤖]+$/u, '').trim(); used[i] = 1; }
+    }
+    j.title = j.title || label('position|role|job title|designation|opening');
+    if (j.title && j.title === j.title.toUpperCase()) j.title = j.title.toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); }).replace(/\b(Rpa|Ai|Ml|Sap|Qa|It|Ui|Ux)\b/g, function (w) { return w.toUpperCase(); });
+
+    j.location = label('location|job location|work location|locations');
+    j.experience = label('experience|exp|total experience|overall experience');
+    j.relevantExperience = label('relevant (?:rpa )?experience|relevant exp');
+    j.mandatorySkill = label('mandatory skills?|must have|primary skill');
+    j.type = label('employment type|job type|type');
+    j.domain = label('domain|industry');
+    j.openings = (label('openings?|positions?|no\\.? of (?:positions|openings)|vacancies') || '').replace(/[^\d]/g, '');
+    j.salary = label('salary|ctc|package|budget|compensation');
+    j.postedBy = label('posted by|recruiter|contact person|hr');
+    var co = label('company|client|organization|organisation');
+    var mode = label('mode|work mode|work type');
+    var pm = text.match(/(?:posted by|shared by)\s*:?\s*([^\n]+)/i);
+    if (!j.postedBy && pm) j.postedBy = pm[1].trim();
+    var unparen = function (x) { x = String(x || '').trim(); return (x.split('(').length < x.split(')').length) ? x.replace(/\)\s*$/, '').trim() : x; };
+    var cm = co.match(/^(.+?)\s*\(posted by\s*(.+?)\)?$/i);
+    if (cm) { co = cm[1]; j.postedBy = j.postedBy || cm[2]; }
+    j.company = co; j.postedBy = unparen(j.postedBy);
+    if (!j.company) {
+      for (i = 0; i < clean.length; i++) {
+        var cm2 = clean[i].match(/^([A-Z][\w&.]*(?:\s+[A-Z][\w&.]*){0,4})\s+(?:[—–-]|:)\s+(.{8,80})$/);
+        if (cm2 && /technolog|solution|systems|labs|software|consult|services|infotech|pvt|ltd|inc/i.test(cm2[1])) { j.company = cm2[1]; j.companyAbout = cm2[2]; used[i] = 1; break; }
+      }
+    }
+    // Work mode
+    var wm = (mode + ' ' + j.location + ' ' + text).toLowerCase();
+    j.workMode = /hybrid/.test(wm) ? 'Hybrid' : /(100%\s*)?remote|work from home|wfh/.test(wm) ? 'Remote' : /on-?site|work from office|wfo/.test(wm) ? 'On-site' : '';
+    j.location = j.location.replace(/\s*\((hybrid|remote|on-?site)\)\s*/i, '').trim();
+    if (!j.location && j.workMode === 'Remote') j.location = 'Remote';
+    if (/^(full[\s-]?time|contract|part[\s-]?time|internship|freelance|c2h)/i.test(mode) && !j.type) j.type = mode;
+    if (j.type) j.type = j.type.replace(/^full[\s-]?time$/i, 'Full-Time').replace(/^part[\s-]?time$/i, 'Part-Time');
+    if (!j.salary) { var sm = text.match(/(?:up to\s*)?₹\s?[\d.,]+\s*(?:LPA|lakhs?|L|CTC)?(?:\s*[-–to]+\s*₹?\s?[\d.,]+\s*(?:LPA|lakhs?|L)?)?|\b\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?\s*LPA\b/i); if (sm) j.salary = sm[0].trim(); }
+    if (!j.openings) { var om = text.match(/(\d+)\s*(?:openings|positions|vacancies)/i); if (om) j.openings = om[1]; }
+
+    // Contacts
+    var em = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+\w/); if (em) j.applyEmail = em[0];
+    var web = text.match(/\b(?:https?:\/\/)?www\.[\w-]+\.[\w.\/-]+/i); if (web) j.companyWebsite = web[0].replace(/^https?:\/\//, '');
+    var wa = text.match(/whats\s?app[^\d+\n]{0,20}(\+?\d[\d\s-]{8,}\d)/i);
+    if (wa) j.applyWhatsapp = wa[1].replace(/\s+/g, ' ').trim();
+    else { var ph = text.match(/(?:\+\d{1,3}[\s-]?)?\b\d{10}\b/); if (ph) j.contactPhone = ph[0]; }
+    var how = text.match(/(?:how to apply|to apply)\s*:?\s*([^\n]*(?:dm|linkedin|message|inbox)[^\n]*)/i) || text.match(/((?:dm|message) the recruiter[^\n]*)/i);
+    if (how) j.howToApply = how[1].trim();
+
+    // Sections (bullets under a heading)
+    var section = null, buckets = { requirements: [], responsibilities: [], lookingFor: [], why: [] }, intro = [];
+    var isHead = function (l) {
+      var x = l.toLowerCase().replace(/[:?]+$/, '');
+      if (l.length > 60 || (!/:$/.test(l) && l.split(/\s+/).length > 6)) return null;
+      if (/responsibilit|what you.?ll do|duties|role & resp/.test(x)) return 'responsibilities';
+      if (/looking for|qualification|requirement|who you are|eligibility|candidate profile/.test(x)) return 'lookingFor';
+      if (/skill|expertise|tech stack|technical/.test(x)) return 'requirements';
+      if (/why join|about us|benefit|perks|what we offer/.test(x)) return 'why';
+      if (/job overview|overview|apply|thank|hiring|details/.test(x)) return 'stop';
+      return null;
+    };
+    for (i = 0; i < clean.length; i++) {
+      var l = clean[i]; if (!l) continue;
+      if (/wishing you|stay connected|keep watching|all the best|premium (?:group|member)|want to apply|join our premium|for more info|more job updates/i.test(l)) continue;
+      if (used[i]) continue;
+      var inl = l.match(/^([^:]{2,40}):\s*(.+)$/), h = isHead(inl ? inl[1] : l);
+      if (h && inl && h !== 'stop' && !/^(how to apply|apply)/i.test(inl[1])) {         // "Skills: UiPath Studio & Orchestrator"
+        var parts = inl[2].split(/\s*(?:,|;|\s&\s|\band\b)\s*/).filter(Boolean);
+        var first = (parts[0].match(/^(\w+)\s/) || [])[1];                                   // "UiPath Studio & Orchestrator" → both UiPath …
+        buckets[h] = buckets[h].concat(parts.map(function (x, k) { return k && first && x.split(' ').length === 1 && parts[0].indexOf(first) === 0 ? first + ' ' + x : x; }));
+        section = null; continue;
+      }
+      if (h) { section = h === 'stop' ? null : h; continue; }
+      if (/^(location|experience|exp|position|role|employment type|domain|salary|openings?|company|mode|posted by|apply|apply now|website|email|whatsapp|relevant[\w ]*|mandatory[\w ]*)\s*[:\-–—|]/i.test(l)) { section = section && /^(apply|website|email|whatsapp)/i.test(l) ? null : section; continue; }
+      if (/@|www\.|https?:|whatsapp|\bdm\b|thank you|tag professionals|interested candidates|share (?:your|their) (?:updated )?(?:cv|resume)/i.test(l)) continue;
+      if (section) buckets[section].push(l.replace(/[.;]+$/, ''));
+      else if (l.length > 40 && !/^(we are|we're) hiring/i.test(l)) intro.push(l);
+    }
+    j.requirements = buckets.requirements.join('\n');
+    j.responsibilities = buckets.responsibilities.join('\n');
+    j.lookingFor = buckets.lookingFor.join('\n');
+    j.description = intro.slice(0, 2).join(' ');
+    if (j.company && j.description) j.description = j.description.split(j.company).join('our client').replace(/(^|[.!?]\s+)our client/g, '$1Our client');
+
+    // Skill tags + category
+    var found = TOOLS.filter(function (t) { return new RegExp('(^|[^\\w.])' + t.replace(/[.+#]/g, '\\$&') + '(?![\\w])', 'i').test(text); });
+    if (j.mandatorySkill && found.indexOf(j.mandatorySkill) === -1) found.unshift(j.mandatorySkill);
+    j.skills = found.slice(0, 8).join(', ');
+    j.category = RPA_TOOLS.test(text) ? 'RPA' : (found[0] || '');
+    Object.keys(j).forEach(function (k) { if (!j[k]) delete j[k]; });
+    return j;
+  }
+
+  $('pasteFill').addEventListener('click', function () {
+    var raw = $('pasteText').value.trim();
+    if (!raw) { toast('Paste a job post first'); return; }
+    var j = parsePost(raw), n = fillJobForm(j, false);
+    $('pasteNote').textContent = n ? '✓ Filled ' + n + ' fields. Please check each one, fix anything wrong and add what is missing.' : 'Could not read this post — please fill the form manually.';
+    if (n) $('pasteBox').open = false;
+    JF('title').focus();
+  });
+
+  // ----- Import several jobs from a file (e.g. previous-jobs.json) -----
+  $('importJobs').addEventListener('change', async function (e) {
+    var f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    var cfg = needCfg(); if (!cfg) return;
+    try {
+      var data = JSON.parse(await f.text()), list = Array.isArray(data) ? data : data.jobs;
+      if (!Array.isArray(list) || !list.length) throw new Error('no jobs in this file');
+      if (!confirm('Post ' + list.length + ' job(s) from "' + f.name + '"?')) return;
+      var done = 0;
+      for (var i = 0; i < list.length; i++) {
+        toast('Posting ' + (i + 1) + ' of ' + list.length + '…');
+        var job = Object.assign({}, list[i]); delete job.id;
+        var res = await apiPost(cfg, { action: 'saveJob', job: job });
+        J.jobs.unshift(res.job); done++;
+      }
+      renderJobs(); toast(done + ' job(s) posted — click 📱 WhatsApp post on each one');
+    } catch (err) { toast('Import failed — ' + (err && err.message || err)); loadJobs(true); }
+  });
+
+  function openApps(jobId) {
+    J.jobId = jobId || ''; J.st = '';
+    $('appsBar').querySelectorAll('[data-st]').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.st === '')); });
+    renderApps(); appsDlg.showModal();
+  }
+
+  function renderApps() {
+    var j = J.jobs.find(function (x) { return x.id === J.jobId; });
+    var all = appsFor(J.jobId).sort(function (a, b) { return b.submitted - a.submitted; });
+    var c = counts(all);
+    $('appsTitle').textContent = (j ? j.title : 'General applications') + ' — ' + all.length + ' applicant' + (all.length === 1 ? '' : 's');
+    $('appsBar').querySelectorAll('[data-st]').forEach(function (b) {
+      var n = b.dataset.st ? c[b.dataset.st] : all.length;
+      b.textContent = { '': 'All', New: 'New', Shortlisted: 'Approved', Rejected: 'Rejected' }[b.dataset.st] + ' (' + n + ')';
+    });
+    var list = all.filter(function (a) { return !J.st || a.status === J.st; });
+    if (!list.length) { $('appsList').innerHTML = '<div class="loading">' + (all.length ? 'No applicants with this status.' : 'No applications yet. Share the job link to get applicants.') + '</div>'; return; }
+    $('appsList').innerHTML = list.map(function (a) {
+      var meta1 = [esc(a.title), esc(yrs(a.experience))]; if (a.address) meta1.push('📍 ' + esc(a.address));
+      var meta2 = [];
+      if (a.email) meta2.push('<a href="mailto:' + esc(a.email) + '">✉ ' + esc(a.email) + '</a>');
+      if (a.phone) meta2.push('<a href="tel:' + esc(a.phone.replace(/[^\d+]/g, '')) + '">☏ ' + esc(a.phone) + '</a>');
+      if (a.linkedin) meta2.push('<a href="' + esc(safeUrl(a.linkedin)) + '" target="_blank" rel="noopener">in LinkedIn</a>');
+      meta2.push('<span>Applied ' + fmtDate(a.submitted) + '</span>');
+      var tags = splitSkills(a.skills).map(function (s) { return '<span class="tag">' + esc(s) + '</span>'; }).join('');
+      var label = { New: 'New', Shortlisted: 'Approved', Rejected: 'Rejected' }[a.status];
+      return '<div class="app ' + esc(a.status) + '"><div class="app-main">' +
+        '<div class="app-name"><b>' + esc(a.name) + '</b><span class="pill ' + esc(a.status) + '">' + label + '</span></div>' +
+        '<div class="meta">' + meta1.join(' · ') + '</div><div class="meta">' + meta2.join('') + '</div>' +
+        (tags ? '<div class="tags">' + tags + '</div>' : '') +
+        (a.message ? '<p class="app-msg">' + esc(a.message) + '</p>' : '') + '</div>' +
+        '<div class="app-actions">' +
+          (a.resumeUrl ? '<a class="btn btn-outline btn-sm" href="' + esc(safeUrl(a.resumeUrl)) + '" target="_blank" rel="noopener">📄 Resume</a>' : '<span class="meta">No resume</span>') +
+          (a.status !== 'Shortlisted' ? '<button class="btn btn-ok btn-sm" data-st-set="Shortlisted" data-id="' + esc(a.id) + '">✓ Approve</button>' : '') +
+          (a.status !== 'Rejected' ? '<button class="btn btn-no btn-sm" data-st-set="Rejected" data-id="' + esc(a.id) + '">✕ Reject</button>' : '') +
+          (a.status !== 'New' ? '<button class="btn btn-outline btn-sm" data-st-set="New" data-id="' + esc(a.id) + '">↺ Undo</button>' : '') +
+        '</div></div>';
+    }).join('');
+  }
+
+  $('appsBar').addEventListener('click', function (e) {
+    var c = e.target.closest('[data-st]'); if (!c) return;
+    J.st = c.dataset.st;
+    $('appsBar').querySelectorAll('[data-st]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
+    renderApps();
+  });
+
+  $('appsList').addEventListener('click', async function (e) {
+    var b = e.target.closest('[data-st-set]'); if (!b) return;
+    var cfg = needCfg(); if (!cfg) return;
+    var a = J.apps.find(function (x) { return x.id === b.dataset.id; }), status = b.dataset.stSet;
+    var notify = status === 'Shortlisted' && $('notifyOnApprove').checked;
+    b.closest('.app').querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+    b.textContent = 'Saving…';
+    try {
+      var res = await apiPost(cfg, { action: 'setStatus', id: a.id, status: status, notify: notify });
+      a.status = status; renderApps(); renderJobs();
+      toast(status === 'Shortlisted' ? (res.emailed ? 'Approved — shortlist email sent to ' + a.name : 'Approved ' + a.name + ' (no email sent)')
+          : status === 'Rejected' ? 'Rejected ' + a.name : 'Moved back to New');
+    } catch (err) { toast('Failed — ' + (err && err.message || err)); renderApps(); }
+  });
+
+  $('postJobBtn').addEventListener('click', function () { if (needCfg()) openJobForm(null); });
+  $('jobsRefresh').addEventListener('click', function () { loadJobs(); });
+
+  // ----- view switching -----
+  function setView(v) {
+    document.body.dataset.view = v;
+    document.querySelectorAll('.tabs [data-view]').forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.view === v)); });
+    try { localStorage.setItem('basman-view', v); } catch (e) {}
+    if (v === 'jobs') loadJobs(J.loaded);
+  }
+  document.querySelectorAll('.tabs [data-view]').forEach(function (t) { t.addEventListener('click', function () { setView(t.dataset.view); }); });
 
   // ===== Events =====
   $('addBtn').addEventListener('click', function () { openEdit(null); });
@@ -647,6 +1337,9 @@ form.f{display:flex;flex-direction:column;gap:14px}
   });
 
   // ===== Start =====
+  var startView = location.hash === '#jobs' ? 'jobs' : (function () { try { return localStorage.getItem('basman-view'); } catch (e) { return null; } })();
+  setView(startView === 'jobs' ? 'jobs' : 'bench');
+  if (startView !== 'jobs' && getSync()) api(getSync(), { action: 'list' }).then(function (r) { J.apps = r.candidates || []; updateBadge(); }).catch(function () {});
   openDB().then(function (d) {
     db = d;
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
