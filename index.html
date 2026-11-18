@@ -95,10 +95,17 @@ nav.main a.btn{color:#fff;min-height:44px;padding:0 20px;font-size:15px}
 .dark{background:var(--gray);color:#fff}
 .dark h2{color:#fff}
 .dark .eyebrow{color:#FFD5D8}
-.demo-box{aspect-ratio:16/9;background:var(--gray-2);border:1px solid var(--gray-3);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.demo-box video{width:100%;height:100%;object-fit:cover;display:block}
-.play{width:60px;height:60px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center}
-.demo-title{margin-top:14px;font-family:'Outfit',sans-serif;font-size:18px;font-weight:500}
+.demo-box{position:relative;aspect-ratio:16/9;background:#F7F4F3;border:1px solid var(--gray-3);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.demo-box > svg{width:100%;height:100%;display:block}
+.demo-box video,.demo-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover;display:block;background:#000}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .15s}
+.play:hover{transform:translate(-50%,-50%) scale(1.08)}
+.play[hidden]{display:none}
+.soon{position:absolute;right:10px;bottom:10px;background:rgba(31,30,30,.78);color:#fff;font-size:12px;font-weight:600;border-radius:999px;padding:5px 11px;letter-spacing:.02em}
+.demo-title{margin-top:16px;font-family:'Outfit',sans-serif;font-size:20px;font-weight:600;color:#fff}
+.demo-desc{margin:6px 0 10px;font-size:14.5px;line-height:1.55;color:#E6E3E2}
+.demo-tags{display:flex;flex-wrap:wrap;gap:6px}
+.demo-tags span{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:2px 8px}
 
 /* Forms */
 .forms{display:flex;flex-wrap:wrap;gap:24px}
@@ -187,10 +194,21 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .md-tabs button[aria-selected="true"]{color:var(--red);border-bottom-color:var(--red)}
 .md-body{display:flex;flex-direction:column;gap:12px;padding:18px 22px 22px}
 .md-body[hidden]{display:none}
-.md-body label{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:500;color:var(--gray)}
+.md-body label{display:block;font-size:13.5px;font-weight:500;color:var(--gray)}
+.md-body label > input:not([type=checkbox]),.md-body label > select{display:block;width:100%;margin-top:5px}
+.md-check{display:flex!important}
 .md-lead{margin:0;font-size:14px;color:var(--muted)}
 .md-hint{font-weight:400;color:#7A7A80}
 .md-note{margin:0;font-size:14px;min-height:20px}
+.md-link{background:none;border:0;padding:2px 0;font:inherit;font-size:14px;color:var(--red);text-decoration:underline;cursor:pointer;align-self:flex-start}
+.md-check{flex-direction:row!important;align-items:center;gap:8px!important;font-weight:400!important}
+.md-check input{width:18px;height:18px;accent-color:var(--red);margin:0}
+.md-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.md-body select,.md-body input[type=file]{font:inherit;font-size:15px}
+.md-body select{border:1px solid #CFC8C5;border-radius:8px;padding:10px 12px;background:#fff;min-height:44px}
+#memberDlg{max-height:92vh;overflow:auto}
+.md-tabs[hidden]{display:none}
+.btn-applied{background:#E3F4EA;color:#17663A;cursor:default}
 .md-note.ok{color:#17663A}.md-note.err{color:var(--red)}
 
 /* Mobile */
@@ -221,6 +239,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
   .member-bar{justify-content:flex-start;width:100%}
   .member-bar .btn{flex:1 1 auto}
   #memberDlg{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0}
+  .md-row{grid-template-columns:1fr}
   .jobs-bar input{font-size:16px}
   .job{padding:18px}
   .job h3{font-size:19px}
@@ -328,14 +347,135 @@ footer{border-top:1px solid var(--line)}
 
 <section id="demos" class="dark">
   <div class="wrap pad">
-    <p class="eyebrow">Demo videos</p>
-    <h2 style="margin-bottom:48px">See our automations in action</h2>
+    <p class="eyebrow">Demo projects</p>
+    <h2 style="margin-bottom:12px">See our automations in action</h2>
+    <p style="margin:0 0 40px;color:#E6E3E2;max-width:640px">Real-world automations we build for finance, operations and HR teams. Video walkthroughs are coming soon.</p>
     <div class="grid3">
-      <!-- To add a real video, replace the inner <div class="play">…</div> with:
-           <video src="assets/demo1.mp4" controls preload="metadata"></video> -->
-      <div><div class="demo-box"><div class="play"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div><div class="demo-title">Demo 1 — [Add video title]</div></div>
-      <div><div class="demo-box"><div class="play"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div><div class="demo-title">Demo 2 — [Add video title]</div></div>
-      <div><div class="demo-box"><div class="play"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div><div class="demo-title">Demo 3 — [Add video title]</div></div>
+      <!-- TO ADD A VIDEO: put a YouTube link or a video file path in data-video="" of that demo.
+           Examples:  data-video="https://youtu.be/AbCdEfGhIjk"   or   data-video="assets/invoice-demo.mp4"
+           The picture stays as the cover; visitors click ▶ to play. -->
+      <div class="demo" data-video="">
+        <div class="demo-box">
+        <svg viewBox="0 0 480 270" role="img" aria-label="Illustration: a PDF invoice is read by a bot and turned into a spreadsheet">
+          <rect width="480" height="270" fill="#F7F4F3"/>
+          <g transform="translate(40 38)">
+            <rect width="132" height="176" rx="10" fill="#fff" stroke="#D9D2CF" stroke-width="2"/>
+            <rect x="14" y="16" width="62" height="10" rx="3" fill="#A01A25"/>
+            <text x="14" y="46" font-family="Outfit,Arial" font-size="11" font-weight="700" fill="#55555A">INVOICE #4021</text>
+            <rect x="14" y="56" width="104" height="6" rx="3" fill="#ECE7E5"/><rect x="14" y="68" width="80" height="6" rx="3" fill="#ECE7E5"/>
+            <rect x="14" y="90" width="104" height="1.5" fill="#D9D2CF"/>
+            <rect x="14" y="100" width="60" height="6" rx="3" fill="#D9D2CF"/><rect x="92" y="100" width="26" height="6" rx="3" fill="#D9D2CF"/>
+            <rect x="14" y="114" width="52" height="6" rx="3" fill="#D9D2CF"/><rect x="92" y="114" width="26" height="6" rx="3" fill="#D9D2CF"/>
+            <rect x="14" y="128" width="66" height="6" rx="3" fill="#D9D2CF"/><rect x="92" y="128" width="26" height="6" rx="3" fill="#D9D2CF"/>
+            <rect x="60" y="148" width="58" height="16" rx="4" fill="#FBEFF0" stroke="#A01A25" stroke-width="1.5"/>
+            <text x="89" y="160" text-anchor="middle" font-family="Outfit,Arial" font-size="10" font-weight="700" fill="#A01A25">₹ 48,250</text>
+            <rect x="-6" y="-8" width="40" height="18" rx="5" fill="#55555A"/><text x="14" y="5" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#fff">PDF</text>
+          </g>
+          <g transform="translate(206 104)">
+            <path d="M0 31 H60" stroke="#A01A25" stroke-width="3" stroke-dasharray="6 6"/>
+            <circle cx="34" cy="31" r="27" fill="#A01A25"/>
+            <rect x="21" y="20" width="26" height="20" rx="6" fill="#fff"/><circle cx="29" cy="30" r="3" fill="#A01A25"/><circle cx="39" cy="30" r="3" fill="#A01A25"/>
+            <rect x="32" y="12" width="4" height="8" fill="#fff"/><circle cx="34" cy="11" r="3" fill="#fff"/>
+            <path d="M64 31 l-10 -7 v14 z" fill="#A01A25"/>
+          </g>
+          <g transform="translate(296 58)">
+            <rect width="148" height="140" rx="10" fill="#fff" stroke="#D9D2CF" stroke-width="2"/>
+            <rect width="148" height="28" rx="10" fill="#1F8F4E"/><rect y="18" width="148" height="10" fill="#1F8F4E"/>
+            <text x="12" y="19" font-family="Arial" font-size="11" font-weight="700" fill="#fff">invoices.xlsx</text>
+            <g font-family="Arial" font-size="9.5" fill="#55555A">
+              <text x="10" y="46" font-weight="700">Vendor</text><text x="64" y="46" font-weight="700">Date</text><text x="108" y="46" font-weight="700">Total</text>
+              <text x="10" y="66">Acme Ltd</text><text x="64" y="66">12/11</text><text x="108" y="66">48,250</text>
+              <text x="10" y="86">Zenith</text><text x="64" y="86">13/11</text><text x="108" y="86">12,900</text>
+              <text x="10" y="106">Orbit Co</text><text x="64" y="106">14/11</text><text x="108" y="106">7,480</text>
+              <text x="10" y="126">Nova Inc</text><text x="64" y="126">15/11</text><text x="108" y="126">31,600</text>
+            </g>
+            <path d="M0 52 H148 M0 72 H148 M0 92 H148 M0 112 H148 M58 28 V140 M102 28 V140" stroke="#ECE7E5" stroke-width="1"/>
+            <circle cx="138" cy="10" r="0" />
+          </g>
+          <g transform="translate(444 58)"><circle r="16" fill="#1F8F4E" stroke="#F7F4F3" stroke-width="3"/><path d="M-7 0 l5 5 l9 -10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+        </svg>
+        <button type="button" class="play" aria-label="Play video" hidden><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><span class="soon">▶ Video coming soon</span></div>
+        <div class="demo-title">Invoice Data Extraction</div>
+        <p class="demo-desc">Reads PDF and scanned invoices, pulls out vendor, invoice number, date, line items and totals, checks them, and saves everything to Excel or your ERP — no manual typing.</p>
+        <div class="demo-tags"><span>UiPath</span><span>Document Understanding</span><span>AI OCR</span><span>Excel</span></div>
+      </div>
+      <div class="demo" data-video="">
+        <div class="demo-box">
+        <svg viewBox="0 0 480 270" role="img" aria-label="Illustration: email attachments are merged by a bot into a daily Excel report with a chart">
+          <rect width="480" height="270" fill="#F7F4F3"/>
+          <g transform="translate(36 52)">
+            <g><rect width="120" height="76" rx="8" fill="#fff" stroke="#D9D2CF" stroke-width="2"/><path d="M4 6 L60 44 L116 6" stroke="#A01A25" stroke-width="3" fill="none" stroke-linejoin="round"/></g>
+            <g transform="translate(18 92)"><rect width="120" height="76" rx="8" fill="#fff" stroke="#D9D2CF" stroke-width="2"/><path d="M4 6 L60 44 L116 6" stroke="#55555A" stroke-width="3" fill="none" stroke-linejoin="round"/></g>
+            <g transform="translate(96 -14)"><circle r="16" fill="#A01A25"/><text y="5" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#fff">12</text></g>
+            <g transform="translate(110 136)"><rect width="34" height="40" rx="4" fill="#1F8F4E"/><text x="17" y="25" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#fff">XLS</text></g>
+          </g>
+          <g transform="translate(196 104)">
+            <path d="M0 31 H70" stroke="#A01A25" stroke-width="3" stroke-dasharray="6 6"/>
+            <circle cx="38" cy="31" r="27" fill="#A01A25"/>
+            <rect x="25" y="20" width="26" height="20" rx="6" fill="#fff"/><circle cx="33" cy="30" r="3" fill="#A01A25"/><circle cx="43" cy="30" r="3" fill="#A01A25"/>
+            <rect x="36" y="12" width="4" height="8" fill="#fff"/><circle cx="38" cy="11" r="3" fill="#fff"/>
+            <path d="M74 31 l-10 -7 v14 z" fill="#A01A25"/>
+          </g>
+          <g transform="translate(290 48)">
+            <rect width="156" height="170" rx="10" fill="#fff" stroke="#D9D2CF" stroke-width="2"/>
+            <text x="14" y="26" font-family="Outfit,Arial" font-size="13" font-weight="700" fill="#55555A">Daily Sales Report</text>
+            <text x="14" y="42" font-family="Arial" font-size="9.5" fill="#7A7A80">Sent 08:00 · auto</text>
+            <path d="M14 150 H142" stroke="#D9D2CF" stroke-width="1.5"/>
+            <rect x="22" y="104" width="16" height="46" rx="3" fill="#D9D2CF"/>
+            <rect x="48" y="86" width="16" height="64" rx="3" fill="#D9D2CF"/>
+            <rect x="74" y="96" width="16" height="54" rx="3" fill="#D9D2CF"/>
+            <rect x="100" y="70" width="16" height="80" rx="3" fill="#A01A25"/>
+            <text x="108" y="64" text-anchor="middle" font-family="Arial" font-size="9.5" font-weight="700" fill="#A01A25">+18%</text>
+          </g>
+        </svg>
+        <button type="button" class="play" aria-label="Play video" hidden><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><span class="soon">▶ Video coming soon</span></div>
+        <div class="demo-title">Email Attachments → Daily Excel Report</div>
+        <p class="demo-desc">Collects report attachments from Outlook, merges and cleans the data, builds a formatted Excel report with charts, and emails it to managers every morning at 8:00.</p>
+        <div class="demo-tags"><span>Power Automate</span><span>Outlook</span><span>Excel</span><span>Scheduling</span></div>
+      </div>
+      <div class="demo" data-video="">
+        <div class="demo-box">
+        <svg viewBox="0 0 480 270" role="img" aria-label="Illustration: resumes are scored by AI and the best candidates are shortlisted">
+          <rect width="480" height="270" fill="#F7F4F3"/>
+          <g transform="translate(34 46)">
+            <g transform="translate(24 0)"><rect width="104" height="136" rx="9" fill="#fff" stroke="#D9D2CF" stroke-width="2"/></g>
+            <g transform="translate(12 12)"><rect width="104" height="136" rx="9" fill="#fff" stroke="#D9D2CF" stroke-width="2"/></g>
+            <g transform="translate(0 24)">
+              <rect width="104" height="136" rx="9" fill="#fff" stroke="#D9D2CF" stroke-width="2"/>
+              <circle cx="24" cy="26" r="12" fill="#ECE7E5"/><circle cx="24" cy="22" r="5" fill="#7A7A80"/><path d="M14 34 a10 8 0 0 1 20 0" fill="#7A7A80"/>
+              <rect x="42" y="18" width="48" height="7" rx="3" fill="#55555A"/><rect x="42" y="30" width="34" height="6" rx="3" fill="#D9D2CF"/>
+              <rect x="14" y="52" width="76" height="6" rx="3" fill="#ECE7E5"/><rect x="14" y="64" width="64" height="6" rx="3" fill="#ECE7E5"/>
+              <rect x="14" y="84" width="34" height="12" rx="6" fill="#FBEFF0"/><rect x="52" y="84" width="38" height="12" rx="6" fill="#FBEFF0"/>
+              <rect x="14" y="102" width="44" height="12" rx="6" fill="#FBEFF0"/>
+              <text x="52" y="128" text-anchor="middle" font-family="Arial" font-size="9" font-weight="700" fill="#7A7A80">RESUME</text>
+            </g>
+          </g>
+          <g transform="translate(184 104)">
+            <path d="M0 31 H80" stroke="#A01A25" stroke-width="3" stroke-dasharray="6 6"/>
+            <circle cx="42" cy="31" r="28" fill="#A01A25"/>
+            <text x="42" y="37" text-anchor="middle" font-family="Outfit,Arial" font-size="18" font-weight="700" fill="#fff">AI</text>
+            <path d="M84 31 l-10 -7 v14 z" fill="#A01A25"/>
+          </g>
+          <g transform="translate(286 52)">
+            <rect width="160" height="164" rx="10" fill="#fff" stroke="#D9D2CF" stroke-width="2"/>
+            <text x="14" y="26" font-family="Outfit,Arial" font-size="13" font-weight="700" fill="#55555A">Shortlist</text>
+            <g font-family="Arial" font-size="10.5" fill="#55555A">
+              <circle cx="22" cy="52" r="8" fill="#1F8F4E"/><path d="M18 52 l3 3 l5 -6" stroke="#fff" stroke-width="2" fill="none"/>
+              <text x="36" y="56">Candidate A</text><rect x="104" y="44" width="42" height="16" rx="8" fill="#E3F4EA"/><text x="125" y="56" text-anchor="middle" font-weight="700" fill="#17663A">92%</text>
+              <circle cx="22" cy="84" r="8" fill="#1F8F4E"/><path d="M18 84 l3 3 l5 -6" stroke="#fff" stroke-width="2" fill="none"/>
+              <text x="36" y="88">Candidate B</text><rect x="104" y="76" width="42" height="16" rx="8" fill="#E3F4EA"/><text x="125" y="88" text-anchor="middle" font-weight="700" fill="#17663A">87%</text>
+              <circle cx="22" cy="116" r="8" fill="#D9D2CF"/>
+              <text x="36" y="120">Candidate C</text><rect x="104" y="108" width="42" height="16" rx="8" fill="#F7F4F3"/><text x="125" y="120" text-anchor="middle" font-weight="700" fill="#7A7A80">61%</text>
+              <circle cx="22" cy="148" r="8" fill="#D9D2CF"/>
+              <text x="36" y="152">Candidate D</text><rect x="104" y="140" width="42" height="16" rx="8" fill="#F7F4F3"/><text x="125" y="152" text-anchor="middle" font-weight="700" fill="#7A7A80">48%</text>
+            </g>
+          </g>
+        </svg>
+        <button type="button" class="play" aria-label="Play video" hidden><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><span class="soon">▶ Video coming soon</span></div>
+        <div class="demo-title">AI Resume Screening & Shortlisting</div>
+        <p class="demo-desc">Reads hundreds of resumes, matches skills and experience against the job description, scores every candidate, and sends recruiters a ranked shortlist in minutes.</p>
+        <div class="demo-tags"><span>GenAI</span><span>Python</span><span>UiPath</span><span>HR Automation</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -470,6 +610,7 @@ footer{border-top:1px solid var(--line)}
     <label>Email or phone number<input type="text" name="login" required autocomplete="username" placeholder="you@email.com or +91 98765 43210"></label>
     <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
     <button type="submit" class="btn btn-red">Log in</button>
+    <button type="button" class="md-link" data-goto="forgot">Forgot password?</button>
     <p class="md-note" aria-live="polite"></p>
   </form>
   <form id="registerForm" class="md-body" hidden>
@@ -477,10 +618,47 @@ footer{border-top:1px solid var(--line)}
     <label>Full name<input type="text" name="name" required autocomplete="name"></label>
     <label>Email<input type="email" name="email" required autocomplete="email"></label>
     <label>Phone / WhatsApp<input type="tel" name="phone" required autocomplete="tel" placeholder="+91 …"></label>
+    <div class="md-row">
+      <label>Current job title<input type="text" name="title" required placeholder="e.g. RPA Developer"></label>
+      <label>Experience<select name="experience" required><option value="" disabled selected>Select…</option>
+          <option value="0-1">Fresher (0–1 yr)</option><option value="1-3">1–3 years</option><option value="4-6">4–6 years</option>
+          <option value="7-9">7–9 years</option><option value="10-14">10–14 years</option><option value="15+">15–20+ years</option></select></label>
+    </div>
+    <label>Skills <span class="md-hint">(used for job alerts)</span><input type="text" name="skills" required placeholder="UiPath, Blue Prism, Python"></label>
+    <label>Current location<input type="text" name="address" required placeholder="City, Country"></label>
+    <label>Resume <span class="md-hint">(PDF or Word, max 5 MB — lets you apply in one click)</span><input type="file" name="resume" required accept=".pdf,.doc,.docx,.rtf,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
+    <label class="md-check"><input type="checkbox" name="alerts" checked> Email me new jobs that match my skills</label>
     <label>Password <span class="md-hint">(at least 6 characters)</span><input type="password" name="password" required minlength="6" autocomplete="new-password"></label>
     <label>Confirm password<input type="password" name="password2" required minlength="6" autocomplete="new-password"></label>
     <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <button type="submit" class="btn btn-red">Create account</button>
+    <p class="md-note" aria-live="polite"></p>
+  </form>
+  <form id="forgotForm" class="md-body" hidden>
+    <p class="md-lead">Enter the email or phone number of your account. We'll email you a 6-digit code.</p>
+    <label>Email or phone number<input type="text" name="login" required autocomplete="username"></label>
+    <div class="fp-step2" hidden>
+      <label>6-digit code from your email<input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="123456"></label>
+      <label>New password <span class="md-hint">(at least 6 characters)</span><input type="password" name="pw1" minlength="6" autocomplete="new-password"></label>
+      <label>Confirm new password<input type="password" name="pw2" minlength="6" autocomplete="new-password"></label>
+    </div>
+    <button type="submit" class="btn btn-red">Send code</button>
+    <button type="button" class="md-link" data-goto="login">← Back to log in</button>
+    <p class="md-note" aria-live="polite"></p>
+  </form>
+  <form id="accountForm" class="md-body" hidden>
+    <p class="md-lead">Your profile is used for one-click apply and job alerts.</p>
+    <div class="md-row">
+      <label>Current job title<input type="text" name="title" placeholder="e.g. RPA Developer"></label>
+      <label>Experience<select name="experience"><option value="">Select…</option>
+          <option value="0-1">Fresher (0–1 yr)</option><option value="1-3">1–3 years</option><option value="4-6">4–6 years</option>
+          <option value="7-9">7–9 years</option><option value="10-14">10–14 years</option><option value="15+">15–20+ years</option></select></label>
+    </div>
+    <label>Skills <span class="md-hint">(job alerts match these)</span><input type="text" name="skills" placeholder="UiPath, Blue Prism, Python"></label>
+    <label>Current location<input type="text" name="address" placeholder="City, Country"></label>
+    <label>Resume <span class="md-hint" id="accResume"></span><input type="file" name="resume" accept=".pdf,.doc,.docx,.rtf,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
+    <label class="md-check"><input type="checkbox" name="alerts"> Email me new jobs that match my skills</label>
+    <button type="submit" class="btn btn-red">Save</button>
     <p class="md-note" aria-live="polite"></p>
   </form>
 </dialog>
@@ -641,7 +819,7 @@ footer{border-top:1px solid var(--line)}
     var listEl = document.getElementById('jobList'), chipsEl = document.getElementById('jobChips');
     var qEl = document.getElementById('jobQ'), whenEl = document.getElementById('jobWhen'), locEl = document.getElementById('jobLoc');
     var countEl = document.getElementById('jobCount'), form = document.getElementById('careersForm');
-    var jobs = [], chip = '', member = null;
+    var jobs = [], chip = '', member = null, applied = [], profile = null;
     var MKEY = 'basman-member';
     function getMember() { try { return JSON.parse(localStorage.getItem(MKEY)) || null; } catch (e) { return null; } }
     function setMember(v) { try { v ? localStorage.setItem(MKEY, JSON.stringify(v)) : localStorage.removeItem(MKEY); } catch (e) {} }
@@ -743,7 +921,11 @@ footer{border-top:1px solid var(--line)}
           (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
           contact +
           (details ? '<details class="jd" open><summary>Job description</summary>' + details + '</details>' : '') +
-          '<div class="job-actions"><button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>' +
+          '<div class="job-actions">' + (member
+            ? (applied.indexOf(j.id) !== -1
+                ? '<button type="button" class="btn btn-applied" disabled>✓ Applied</button>'
+                : '<button type="button" class="btn btn-red" data-qapply="' + esc(j.id) + '">⚡ Apply in one click</button>')
+            : '<button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>') +
           '<button type="button" class="btn btn-outline" data-share="' + esc(j.id) + '">Copy job link</button></div></article>';
       }).join('');
     }
@@ -768,6 +950,19 @@ footer{border-top:1px solid var(--line)}
       var a = e.target.closest('[data-apply]'), s = e.target.closest('[data-share]');
       if (e.target.id === 'jobReset') { e.preventDefault(); qEl.value = ''; whenEl.value = ''; locEl.value = ''; chip = ''; buildFilters(); render(); return; }
       if (a) { var j = jobs.find(function (x) { return x.id === a.dataset.apply; }); if (j) selectJob(j); }
+      var q = e.target.closest('[data-qapply]');
+      if (q) {
+        var qj = jobs.find(function (x) { return x.id === q.dataset.qapply; }), m = getMember();
+        if (!qj || !m) return;
+        if (!confirm('Apply for "' + qj.title + '"' + (qj.company ? ' at ' + qj.company : '') + ' with your profile and resume?')) return;
+        q.disabled = true; q.textContent = 'Applying…';
+        post({ action: 'quickApply', token: m.token, jobId: qj.id }).then(function (res) {
+          if (res.ok || res.already) { applied.push(qj.id); render(); return; }
+          if (res.sessionExpired) { setMember(null); window.reloadJobs(); openMember('login'); return; }
+          if (res.needResume) { render(); openMember('account'); note(document.getElementById('accountForm'), 'Upload your resume here first, then click ⚡ Apply again.', false); return; }
+          q.disabled = false; q.textContent = '⚡ Apply in one click'; alert(res.error || 'Could not apply');
+        }).catch(function () { q.disabled = false; q.textContent = '⚡ Apply in one click'; alert('Network error — please try again.'); });
+      }
       if (s) {
         var url = location.href.split('#')[0] + '#job-' + s.dataset.share, b = s;
         var ok = function () { b.textContent = 'Link copied ✓'; setTimeout(function () { b.textContent = 'Copy job link'; }, 2000); };
@@ -798,6 +993,10 @@ footer{border-top:1px solid var(--line)}
         if (res && res.sessionExpired) { setMember(null); m = null; }
         member = res && res.member ? res.member : null;
         renderMemberBar();
+        if (member && m && m.token) post({ action: 'me', token: m.token }).then(function (r) {
+          if (r && r.ok) { profile = r.profile; applied = r.applied || []; render(); }
+        }).catch(function () {});
+        if (!member) { applied = []; profile = null; }
         jobs = (res && res.ok && res.jobs || []).sort(function (a, b) { return b.posted - a.posted; });
         var sel = form.elements.namedItem('jobId').value;
         if (sel && !jobs.some(function (j) { return j.id === sel; })) window.clearJobSelection();
@@ -808,19 +1007,44 @@ footer{border-top:1px solid var(--line)}
     };
     // ----- Member login / register -----
     var dlg = document.getElementById('memberDlg'), loginF = document.getElementById('loginForm'), regF = document.getElementById('registerForm');
+    var fpF = document.getElementById('forgotForm'), accF = document.getElementById('accountForm');
     function renderMemberBar() {
       var bar = document.getElementById('memberBar');
-      if (member) bar.innerHTML = '<span class="mb-badge">💎 ' + esc(member.name) + ' · member</span><button type="button" class="btn btn-outline" data-member="logout">Log out</button>';
+      if (member) bar.innerHTML = '<span class="mb-badge">💎 ' + esc(member.name) + ' · member</span><button type="button" class="btn btn-outline" data-member="account">My account</button><button type="button" class="btn btn-outline" data-member="logout">Log out</button>';
       else bar.innerHTML = '<span class="mb-text"><b>Premium members</b> see HR email &amp; phone</span><button type="button" class="btn btn-outline" data-member="login">Log in</button><button type="button" class="btn btn-red" data-member="register">Register</button>';
     }
     function showTab(t) {
       dlg.querySelectorAll('[data-mtab]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.mtab === t)); });
-      loginF.hidden = t !== 'login'; regF.hidden = t !== 'register';
-      setTimeout(function () { (t === 'login' ? loginF : regF).querySelector('input').focus(); }, 50);
+      loginF.hidden = t !== 'login'; regF.hidden = t !== 'register'; fpF.hidden = t !== 'forgot'; accF.hidden = t !== 'account';
+      dlg.querySelector('.md-tabs').hidden = t === 'forgot' || t === 'account';
+      document.getElementById('memberDlgTitle').textContent = t === 'forgot' ? '🔑 Reset password' : t === 'account' ? '💎 My account' : '💎 Member access';
+      if (t === 'account') fillAccount();
+      if (t === 'forgot') { fpF.querySelector('.fp-step2').hidden = true; fpF.querySelector('button[type=submit]').textContent = 'Send code'; note(fpF, '', true); }
+      var f = { login: loginF, register: regF, forgot: fpF, account: accF }[t];
+      setTimeout(function () { var i = f.querySelector('input:not([type=checkbox]):not([type=file])'); if (i) i.focus(); }, 50);
     }
     function openMember(t) { showTab(t); if (!dlg.open) dlg.showModal(); }
     dlg.querySelectorAll('[data-mtab]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.mtab); }); });
     dlg.querySelector('[data-mclose]').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { var g = e.target.closest('[data-goto]'); if (g) showTab(g.dataset.goto); });
+    function fileB64(file) {
+      return new Promise(function (resolve, reject) {
+        if (!file) return resolve(null);
+        if (!/\.(pdf|docx?|rtf|txt)$/i.test(file.name)) return reject(new Error('Resume must be a PDF or Word file.'));
+        if (file.size > 5 * 1048576) return reject(new Error('Resume is larger than 5 MB.'));
+        var fr = new FileReader();
+        fr.onload = function () { resolve({ name: file.name, type: file.type, data: String(fr.result).split(',')[1] }); };
+        fr.onerror = function () { reject(fr.error); };
+        fr.readAsDataURL(file);
+      });
+    }
+    function fillAccount() {
+      var p = profile || {}, E = accF.elements;
+      E.namedItem('title').value = p.title || ''; E.namedItem('experience').value = p.experience || '';
+      E.namedItem('skills').value = p.skills || ''; E.namedItem('address').value = p.address || '';
+      E.namedItem('alerts').checked = p.alerts !== false; E.namedItem('resume').value = '';
+      document.getElementById('accResume').textContent = p.hasResume ? '(current: ' + (p.resumeName || 'uploaded') + ' — choose a file only to replace it)' : '(none yet — upload to apply in one click)';
+    }
     document.addEventListener('click', function (e) {
       var b = e.target.closest('[data-member]'); if (!b) return;
       if (b.dataset.member === 'logout') {
@@ -846,18 +1070,81 @@ footer{border-top:1px solid var(--line)}
       e.preventDefault();
       if (regF.password.value !== regF.password2.value) { note(regF, 'Passwords do not match.', false); return; }
       busy(regF, true, 'Creating account…'); note(regF, '', true);
-      post({ action: 'register', name: regF.elements.namedItem('name').value.trim(), email: regF.email.value.trim(), phone: regF.phone.value.trim(),
-             password: regF.password.value, website: regF.website.value }).then(function (res) {
+      var E = regF.elements;
+      fileB64(E.namedItem('resume').files[0]).then(function (resume) {
+        return post({ action: 'register', name: E.namedItem('name').value.trim(), email: regF.email.value.trim(), phone: regF.phone.value.trim(),
+             password: regF.password.value, website: regF.website.value, title: E.namedItem('title').value.trim(),
+             experience: E.namedItem('experience').value, skills: E.namedItem('skills').value.trim(), address: E.namedItem('address').value.trim(),
+             alerts: E.namedItem('alerts').checked, resume: resume });
+      }).then(function (res) {
         busy(regF, false, 'Create account');
         if (!res.ok) { note(regF, res.error || 'Registration failed', false); return; }
         regF.reset();
         note(regF, '✓ Thank you! Your account is waiting for approval. We will email you as soon as it is approved — then log in here.', true);
-      }).catch(function () { busy(regF, false, 'Create account'); note(regF, 'Network error — please try again.', false); });
+      }).catch(function (err) { busy(regF, false, 'Create account'); note(regF, err && err.message && !/fetch/i.test(err.message) ? err.message : 'Network error — please try again.', false); });
+    });
+
+    // ----- Forgot password: step 1 send code, step 2 code + new password -----
+    fpF.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var E = fpF.elements, step2 = !fpF.querySelector('.fp-step2').hidden, login = E.namedItem('login').value.trim();
+      if (!step2) {
+        busy(fpF, true, 'Sending…');
+        post({ action: 'forgot', login: login }).then(function (res) {
+          busy(fpF, false, 'Set new password');
+          if (!res.ok) { busy(fpF, false, 'Send code'); note(fpF, res.error, false); return; }
+          fpF.querySelector('.fp-step2').hidden = false; E.namedItem('code').focus();
+          note(fpF, res.message + ' Check your inbox (and spam).', true);
+        }).catch(function () { busy(fpF, false, 'Send code'); note(fpF, 'Network error — please try again.', false); });
+        return;
+      }
+      if (E.namedItem('pw1').value !== E.namedItem('pw2').value) { note(fpF, 'Passwords do not match.', false); return; }
+      busy(fpF, true, 'Saving…');
+      post({ action: 'reset', login: login, code: E.namedItem('code').value.trim(), password: E.namedItem('pw1').value }).then(function (res) {
+        busy(fpF, false, 'Set new password');
+        if (!res.ok) { note(fpF, res.error, false); return; }
+        fpF.reset(); showTab('login');
+        loginF.elements.namedItem('login').value = login;
+        note(loginF, '✓ Password changed. Log in with your new password.' + (res.status === 'Pending' ? ' (Your account is still waiting for approval.)' : ''), true);
+      }).catch(function () { busy(fpF, false, 'Set new password'); note(fpF, 'Network error — please try again.', false); });
+    });
+
+    // ----- My account -----
+    accF.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var m = getMember(); if (!m) { showTab('login'); return; }
+      var E = accF.elements;
+      busy(accF, true, 'Saving…'); note(accF, '', true);
+      fileB64(E.namedItem('resume').files[0]).then(function (resume) {
+        return post({ action: 'updateMe', token: m.token, title: E.namedItem('title').value.trim(), experience: E.namedItem('experience').value,
+          skills: E.namedItem('skills').value.trim(), address: E.namedItem('address').value.trim(), alerts: E.namedItem('alerts').checked, resume: resume });
+      }).then(function (res) {
+        busy(accF, false, 'Save');
+        if (!res.ok) { if (res.sessionExpired) { setMember(null); window.reloadJobs(); showTab('login'); } note(accF, res.error || 'Could not save', false); return; }
+        profile = res.profile; applied = res.applied || applied; fillAccount();
+        note(accF, '✓ Saved.' + (profile.hasResume ? ' You can now apply in one click.' : ''), true);
+      }).catch(function (err) { busy(accF, false, 'Save'); note(accF, err && err.message && !/fetch/i.test(err.message) ? err.message : 'Network error — please try again.', false); });
     });
 
     renderMemberBar();
     window.addEventListener('hashchange', openFromHash);
     window.reloadJobs();
+  })();
+
+  // ----- Demo videos: add a YouTube link or .mp4 path in data-video="" and the ▶ button appears -----
+  (function () {
+    function ytId(u) { var m = String(u).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : null; }
+    document.querySelectorAll('.demo').forEach(function (d) {
+      var src = (d.getAttribute('data-video') || '').trim(), box = d.querySelector('.demo-box'), btn = d.querySelector('.play'), soon = d.querySelector('.soon');
+      if (!src) return;
+      btn.hidden = false; if (soon) soon.remove();
+      btn.addEventListener('click', function () {
+        var id = ytId(src), el;
+        if (id) { el = document.createElement('iframe'); el.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'; el.allow = 'autoplay; encrypted-media; picture-in-picture'; el.allowFullscreen = true; el.title = d.querySelector('.demo-title').textContent; }
+        else { el = document.createElement('video'); el.src = src; el.controls = true; el.autoplay = true; el.playsInline = true; }
+        box.appendChild(el); btn.remove();
+      });
+    });
   })();
 
   function toggleMenu(btn) {
