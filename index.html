@@ -199,6 +199,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 #applyForm textarea{display:block;margin-top:5px;font-size:14.5px;line-height:1.5}
 #applyForm input[readonly]{background:#F6F4F3;color:var(--gray)}
 .ap-file{margin:0;font-size:14px;background:#F4FBF6;border:1px solid #CDE7D6;border-radius:8px;padding:10px 12px;color:#17663A}
+.ap-save{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;margin-top:-4px}
+.ap-check{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:14px;font-weight:400;cursor:pointer}
+.ap-check input{width:auto;margin:0}
 .ap-file.missing{background:#FFF6E5;border-color:#F1D9A6;color:#6B4B10}
 .ap-small{font-size:12.5px!important}
 .md-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
@@ -633,6 +636,10 @@ footer{border-top:1px solid var(--line)}
     <label>To<input type="text" name="to" readonly></label>
     <label>Subject<input type="text" name="subject" required maxlength="200"></label>
     <label>Message <span class="md-hint">(edit anything you like)</span><textarea name="body" required rows="11"></textarea></label>
+    <div class="ap-save">
+      <label class="ap-check"><input type="checkbox" name="saveMsg" checked> 💾 Save this message for my next applications</label>
+      <button type="button" class="md-link" id="applyDefault" hidden>Use the default message</button>
+    </div>
     <p class="ap-file" id="applyFile"></p>
     <button type="submit" class="btn btn-red">Send application</button>
     <p class="md-lead ap-small">Sent with your resume attached. The recruiter's reply comes straight to your email, and you get a copy too.</p>
@@ -1071,6 +1078,28 @@ footer{border-top:1px solid var(--line)}
       lines.push('', 'Looking forward to hearing from you.', '', 'Regards,', name, p.phone || '');
       return { subject: subject, body: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim() };
     }
+    // ----- Saved message: each logged-in member's own email body, reused for every application -----
+    function greetingFor(j) { return j.postedBy ? 'Dear ' + String(j.postedBy).split(/\s+/)[0] + ',' : 'Dear Hiring Team,'; }
+    function msgKey() {
+      var p = profile || {}, m = getMember() || {};
+      return 'basman-applymsg:' + String(p.email || p.phone || m.name || 'member').toLowerCase();
+    }
+    function saveMsg(body, j) {                  // store with {greeting} {job} {company} so it fits any job
+      var lines = body.replace(/\r/g, '').split('\n');
+      if (/^\s*(dear|hi|hello|respected)\b/i.test(lines[0] || '')) lines[0] = '{greeting}';
+      var t = lines.join('\n');
+      if (j.title) t = t.split(j.title).join('{job}');
+      if (j.company) t = t.split(j.company).join('{company}');
+      try { localStorage.setItem(msgKey(), t); } catch (e) {}
+    }
+    function loadMsg(j) {
+      var t = null; try { t = localStorage.getItem(msgKey()); } catch (e) {}
+      if (!t) return '';
+      if (!j.company) t = t.replace(/ at \{company\}/g, '');
+      return t.split('{greeting}').join(greetingFor(j)).split('{job}').join(j.title || '').split('{company}').join(j.company || '');
+    }
+    function clearMsg() { try { localStorage.removeItem(msgKey()); } catch (e) {} }
+
     var apDlg = document.getElementById('applyDlg'), apF = document.getElementById('applyForm'), apJob = null, apBtn = null;
     function apNote(msg, ok) { var n = apF.querySelector('.md-note'); n.textContent = msg; n.className = 'md-note ' + (ok ? 'ok' : 'err'); }
     function applyByEmail(j, m, btn) {
@@ -1086,7 +1115,9 @@ footer{border-top:1px solid var(--line)}
       document.getElementById('applyJob').textContent = j.title + (j.company ? ' — ' + j.company : '');
       apF.elements.namedItem('to').value = j.applyEmail;
       apF.elements.namedItem('subject').value = dr.subject;
-      apF.elements.namedItem('body').value = dr.body;
+      var saved = loadMsg(j);
+      apF.elements.namedItem('body').value = saved || dr.body;
+      document.getElementById('applyDefault').hidden = !saved;
       var fileEl = document.getElementById('applyFile'), send = apF.querySelector('button[type=submit]');
       if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Attached: ' + (p.resumeName || 'your resume'); send.disabled = false; }
       else {
@@ -1100,8 +1131,16 @@ footer{border-top:1px solid var(--line)}
       if (e.target === apDlg || e.target.closest('[data-aclose]')) apDlg.close();
       if (e.target.id === 'applyUpload') { apDlg.close(); openMember('account'); note(document.getElementById('accountForm'), 'Upload your resume here, then click ✉ Apply by email again.', false); }
     });
+    document.getElementById('applyDefault').addEventListener('click', function () {
+      if (!apJob) return;
+      clearMsg();
+      apF.elements.namedItem('body').value = draftEmail(apJob).body;
+      this.hidden = true;
+      apNote('Default message restored. Tick 💾 and send to save it again.', true);
+    });
     document.getElementById('applyOwn').addEventListener('click', function () {
       if (!apJob) return;
+      if (apF.elements.namedItem('saveMsg').checked) saveMsg(apF.elements.namedItem('body').value, apJob);
       var su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value.replace('Please find my resume attached', 'Please find my resume attached (attach it before sending)');
       var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
       var url = mobile
@@ -1114,6 +1153,7 @@ footer{border-top:1px solid var(--line)}
       e.preventDefault();
       var m = getMember(), j = apJob; if (!m || !j) return;
       var send = apF.querySelector('button[type=submit]');
+      if (apF.elements.namedItem('saveMsg').checked) saveMsg(apF.elements.namedItem('body').value, j);
       send.disabled = true; send.textContent = 'Sending…'; apNote('', true);
       post({ action: 'emailApply', token: m.token, jobId: j.id, subject: apF.elements.namedItem('subject').value, body: apF.elements.namedItem('body').value }).then(function (res) {
         send.textContent = 'Send application';
