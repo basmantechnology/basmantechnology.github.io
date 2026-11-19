@@ -199,9 +199,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 #applyForm textarea{display:block;margin-top:5px;font-size:14.5px;line-height:1.5}
 #applyForm input[readonly]{background:#F6F4F3;color:var(--gray)}
 .ap-file{margin:0;font-size:14px;background:#F4FBF6;border:1px solid #CDE7D6;border-radius:8px;padding:10px 12px;color:#17663A}
-.ap-save{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;margin-top:-4px}
-.ap-check{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-size:14px;font-weight:400;cursor:pointer}
-.ap-check input{width:auto;margin:0}
 .ap-file.missing{background:#FFF6E5;border-color:#F1D9A6;color:#6B4B10}
 .ap-small{font-size:12.5px!important}
 .md-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
@@ -636,14 +633,11 @@ footer{border-top:1px solid var(--line)}
     <label>To<input type="text" name="to" readonly></label>
     <label>Subject<input type="text" name="subject" required maxlength="200"></label>
     <label>Message <span class="md-hint">(edit anything you like)</span><textarea name="body" required rows="11"></textarea></label>
-    <div class="ap-save">
-      <label class="ap-check"><input type="checkbox" name="saveMsg" checked> 💾 Save this message for my next applications</label>
-      <button type="button" class="md-link" id="applyDefault" hidden>Use the default message</button>
-    </div>
     <p class="ap-file" id="applyFile"></p>
-    <button type="submit" class="btn btn-red">Send application</button>
-    <p class="md-lead ap-small">Sent with your resume attached. The recruiter's reply comes straight to your email, and you get a copy too.</p>
-    <button type="button" class="md-link" id="applyOwn">Or open in my own Gmail (attach the resume yourself)</button>
+    <button type="submit" class="btn btn-red" id="applyOwn">✉ Send from my email</button>
+    <p class="md-lead ap-small" id="applyOwnHint">Opens your own email with everything filled in and your resume ready to attach. You press Send.</p>
+    <button type="button" class="btn btn-outline" id="applyVia">Or let BasMan send it for me (resume attached automatically)</button>
+    <p class="md-lead ap-small">BasMan sends it as “Your name (via BasMan Technology)”. Replies come straight to your email, and you get a copy.</p>
     <p class="md-note" aria-live="polite"></p>
   </form>
 </dialog>
@@ -1078,28 +1072,6 @@ footer{border-top:1px solid var(--line)}
       lines.push('', 'Looking forward to hearing from you.', '', 'Regards,', name, p.phone || '');
       return { subject: subject, body: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim() };
     }
-    // ----- Saved message: each logged-in member's own email body, reused for every application -----
-    function greetingFor(j) { return j.postedBy ? 'Dear ' + String(j.postedBy).split(/\s+/)[0] + ',' : 'Dear Hiring Team,'; }
-    function msgKey() {
-      var p = profile || {}, m = getMember() || {};
-      return 'basman-applymsg:' + String(p.email || p.phone || m.name || 'member').toLowerCase();
-    }
-    function saveMsg(body, j) {                  // store with {greeting} {job} {company} so it fits any job
-      var lines = body.replace(/\r/g, '').split('\n');
-      if (/^\s*(dear|hi|hello|respected)\b/i.test(lines[0] || '')) lines[0] = '{greeting}';
-      var t = lines.join('\n');
-      if (j.title) t = t.split(j.title).join('{job}');
-      if (j.company) t = t.split(j.company).join('{company}');
-      try { localStorage.setItem(msgKey(), t); } catch (e) {}
-    }
-    function loadMsg(j) {
-      var t = null; try { t = localStorage.getItem(msgKey()); } catch (e) {}
-      if (!t) return '';
-      if (!j.company) t = t.replace(/ at \{company\}/g, '');
-      return t.split('{greeting}').join(greetingFor(j)).split('{job}').join(j.title || '').split('{company}').join(j.company || '');
-    }
-    function clearMsg() { try { localStorage.removeItem(msgKey()); } catch (e) {} }
-
     var apDlg = document.getElementById('applyDlg'), apF = document.getElementById('applyForm'), apJob = null, apBtn = null;
     function apNote(msg, ok) { var n = apF.querySelector('.md-note'); n.textContent = msg; n.className = 'md-note ' + (ok ? 'ok' : 'err'); }
     function applyByEmail(j, m, btn) {
@@ -1115,60 +1087,89 @@ footer{border-top:1px solid var(--line)}
       document.getElementById('applyJob').textContent = j.title + (j.company ? ' — ' + j.company : '');
       apF.elements.namedItem('to').value = j.applyEmail;
       apF.elements.namedItem('subject').value = dr.subject;
-      var saved = loadMsg(j);
-      apF.elements.namedItem('body').value = saved || dr.body;
-      document.getElementById('applyDefault').hidden = !saved;
+      apF.elements.namedItem('body').value = dr.body;
       var fileEl = document.getElementById('applyFile'), send = apF.querySelector('button[type=submit]');
-      if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Attached: ' + (p.resumeName || 'your resume'); send.disabled = false; }
+      var via = document.getElementById('applyVia');
+      if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Your resume: ' + (p.resumeName || 'resume'); via.disabled = false; prefetchResume(); }
       else {
         fileEl.className = 'ap-file missing';
-        fileEl.innerHTML = '📎 No resume yet — <button type="button" class="md-link" id="applyUpload">upload it in My account</button>, then apply again.';
-        send.disabled = true;
+        fileEl.innerHTML = '📎 No resume saved — <button type="button" class="md-link" id="applyUpload">upload it in My account</button> so it can be attached.';
+        via.disabled = true;
       }
+      send.disabled = false;
       apDlg.showModal();
     }
     apDlg.addEventListener('click', function (e) {
       if (e.target === apDlg || e.target.closest('[data-aclose]')) apDlg.close();
       if (e.target.id === 'applyUpload') { apDlg.close(); openMember('account'); note(document.getElementById('accountForm'), 'Upload your resume here, then click ✉ Apply by email again.', false); }
     });
-    document.getElementById('applyDefault').addEventListener('click', function () {
-      if (!apJob) return;
-      clearMsg();
-      apF.elements.namedItem('body').value = draftEmail(apJob).body;
-      this.hidden = true;
-      apNote('Default message restored. Tick 💾 and send to save it again.', true);
-    });
-    document.getElementById('applyOwn').addEventListener('click', function () {
-      if (!apJob) return;
-      if (apF.elements.namedItem('saveMsg').checked) saveMsg(apF.elements.namedItem('body').value, apJob);
-      var su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value.replace('Please find my resume attached', 'Please find my resume attached (attach it before sending)');
-      var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-      var url = mobile
-        ? 'mailto:' + encodeURIComponent(apJob.applyEmail) + '?subject=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body)
-        : 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(apJob.applyEmail) + '&su=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body);
-      if (mobile) location.href = url; else window.open(url, '_blank', 'noopener');
-      apNote('Gmail opened in a new tab — attach your resume there and press Send.', true);
-    });
+    var apMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent), apFile = null, apFileFor = '';
+    function prefetchResume() {                  // fetched when the box opens, so Send works instantly
+      var m = getMember(); if (!m || !(profile && profile.hasResume)) return;
+      if (apFile && apFileFor === m.token) return;
+      post({ action: 'myResume', token: m.token }).then(function (res) {
+        if (!res || !res.ok) return;
+        var bin = atob(res.data), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        apFile = new File([bytes], res.name, { type: res.type || 'application/pdf' }); apFileFor = m.token;
+      }).catch(function () {});
+    }
+    function downloadFile(f) {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name;
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    }
+    function recordApply(j) {                    // lets you see who applied (Applicants sheet + email to you)
+      var m = getMember(); if (!m) return;
+      post({ action: 'quickApply', token: m.token, jobId: j.id, viaEmail: true }).catch(function () {});
+      if (applied.indexOf(j.id) === -1) applied.push(j.id);
+    }
+    function appliedDone(j, html) {
+      apDlg.close(); render();
+      var b2 = document.querySelector('#job-' + CSS.escape(j.id) + ' [data-qapply]');
+      if (b2) applyNote(b2, html, true);
+    }
+    // Main button: send from the candidate's OWN email
     apF.addEventListener('submit', function (e) {
       e.preventDefault();
+      var j = apJob; if (!j) return;
+      var to = j.applyEmail, su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value;
+      var f = apFile;
+      if (!f && profile && profile.hasResume) { apNote('Getting your resume ready… please click Send again in a moment.', true); prefetchResume(); return; }
+      // Phone: share sheet → choose Gmail → the resume is already attached
+      if (apMobile && f && navigator.canShare && navigator.canShare({ files: [f] })) {
+        try { navigator.clipboard && navigator.clipboard.writeText(to); } catch (x) {}
+        navigator.share({ files: [f], title: su, text: body }).then(function () {
+          recordApply(j);
+          appliedDone(j, '✓ If you chose Gmail: paste <b>' + esc(to) + '</b> in “To” (it is copied), check the subject and press Send.');
+        }).catch(function () { apNote('Share was cancelled. Tap Send again, or let BasMan send it for you.', false); });
+        return;
+      }
+      // Computer (or phone without file sharing): open Gmail filled in + download the resume to attach
+      var url = apMobile
+        ? 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body)
+        : 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(to) + '&su=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body);
+      if (f) downloadFile(f);
+      if (apMobile) location.href = url; else window.open(url, '_blank');
+      recordApply(j);
+      appliedDone(j, '✓ Your email is open' + (apMobile ? ' in your mail app' : ' in Gmail (new tab)') + '. ' +
+        (f ? '<b>Drag the downloaded file “' + esc(f.name) + '” into the email</b> (or click 📎 and pick it from Downloads), then press Send.' : 'Attach your resume and press Send.') +
+        (apMobile ? '' : ' Did not open? <a href="' + esc(url) + '" target="_blank" rel="noopener">Click here</a>.'));
+    });
+    // Second button: BasMan sends it with the resume attached automatically
+    document.getElementById('applyVia').addEventListener('click', function () {
       var m = getMember(), j = apJob; if (!m || !j) return;
-      var send = apF.querySelector('button[type=submit]');
-      if (apF.elements.namedItem('saveMsg').checked) saveMsg(apF.elements.namedItem('body').value, j);
-      send.disabled = true; send.textContent = 'Sending…'; apNote('', true);
+      var send = this; send.disabled = true; var lbl = send.textContent; send.textContent = 'Sending…'; apNote('', true);
       post({ action: 'emailApply', token: m.token, jobId: j.id, subject: apF.elements.namedItem('subject').value, body: apF.elements.namedItem('body').value }).then(function (res) {
-        send.textContent = 'Send application';
+        send.disabled = false; send.textContent = lbl;
         if (res.ok || res.already) {
           if (applied.indexOf(j.id) === -1) applied.push(j.id);
-          apDlg.close(); render();
-          var b2 = document.querySelector('#job-' + CSS.escape(j.id) + ' [data-qapply]');
-          if (b2) applyNote(b2, res.ok ? '✓ <b>Sent!</b> Your application and resume went to ' + esc(res.to || j.applyEmail) + '. A copy is in your email inbox.' : '✓ You have already applied for this job.', true);
+          appliedDone(j, res.ok ? '✓ <b>Sent!</b> Your application and resume went to ' + esc(res.to || j.applyEmail) + '. A copy is in your email inbox.' : '✓ You have already applied for this job.');
           return;
         }
-        send.disabled = false;
         if (res.sessionExpired) { apDlg.close(); setMember(null); window.reloadJobs(); openMember('login'); return; }
         if (res.needResume) { apDlg.close(); openMember('account'); note(document.getElementById('accountForm'), res.error, false); return; }
         apNote(res.error || 'Could not send — please try again.', false);
-      }).catch(function () { send.disabled = false; send.textContent = 'Send application'; apNote('Network error — please try again.', false); });
+      }).catch(function () { send.disabled = false; send.textContent = lbl; apNote('Network error — please try again.', false); });
     });
 
     listEl.addEventListener('click', function (e) {
