@@ -193,8 +193,14 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .job-contact .jc-title{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#17663A}
 .job-locked{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;border:1px dashed #E3BFC2;background:#FDF7F7;border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:14px;color:var(--red-dark)}
 .job-locked button{background:none;border:0;padding:2px;font:inherit;font-weight:700;color:var(--red);text-decoration:underline;cursor:pointer}
-#memberDlg{border:0;border-radius:16px;padding:0;width:min(440px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}
-#memberDlg::backdrop{background:rgba(31,30,30,.5)}
+#memberDlg,#applyDlg{border:0;border-radius:16px;padding:0;width:min(440px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#applyDlg{width:min(600px,96vw)}
+#memberDlg::backdrop,#applyDlg::backdrop{background:rgba(31,30,30,.5)}
+#applyForm textarea{display:block;margin-top:5px;font-size:14.5px;line-height:1.5}
+#applyForm input[readonly]{background:#F6F4F3;color:var(--gray)}
+.ap-file{margin:0;font-size:14px;background:#F4FBF6;border:1px solid #CDE7D6;border-radius:8px;padding:10px 12px;color:#17663A}
+.ap-file.missing{background:#FFF6E5;border-color:#F1D9A6;color:#6B4B10}
+.ap-small{font-size:12.5px!important}
 .md-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
 .md-head h2{font-size:22px}
 .md-x{background:none;border:0;font-size:28px;line-height:1;cursor:pointer;color:var(--gray)}
@@ -217,7 +223,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .md-body select{border:1px solid #CFC8C5;border-radius:8px;padding:10px 12px;background:#fff;min-height:44px}
 #memberDlg{max-height:92vh;overflow:auto}
 .md-tabs[hidden]{display:none}
-.btn-applied{background:#E3F4EA;color:#17663A;cursor:default}
+.btn-applied{background:#E3F4EA;color:#17663A;border:1px solid #CDE7D6}
+.apply-note{flex-basis:100%;font-size:14px;margin:4px 0 0;padding:10px 12px;border-radius:8px;background:#FFF6E5;border:1px solid #F1D9A6;color:#6B4B10}
+.apply-note.ok{background:#F4FBF6;border-color:#CDE7D6;color:#17663A}
 .md-note.ok{color:#17663A}.md-note.err{color:var(--red)}
 
 /* Mobile */
@@ -615,6 +623,24 @@ footer{border-top:1px solid var(--line)}
   <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
 </a>
 
+<dialog id="applyDlg" aria-labelledby="applyDlgTitle">
+  <div class="md-head">
+    <h2 id="applyDlgTitle">✉ Apply by email</h2>
+    <button type="button" class="md-x" data-aclose aria-label="Close">×</button>
+  </div>
+  <form id="applyForm" class="md-body">
+    <p class="md-lead" id="applyJob"></p>
+    <label>To<input type="text" name="to" readonly></label>
+    <label>Subject<input type="text" name="subject" required maxlength="200"></label>
+    <label>Message <span class="md-hint">(edit anything you like)</span><textarea name="body" required rows="11"></textarea></label>
+    <p class="ap-file" id="applyFile"></p>
+    <button type="submit" class="btn btn-red">Send application</button>
+    <p class="md-lead ap-small">Sent with your resume attached. The recruiter's reply comes straight to your email, and you get a copy too.</p>
+    <button type="button" class="md-link" id="applyOwn">Or open in my own Gmail (attach the resume yourself)</button>
+    <p class="md-note" aria-live="polite"></p>
+  </form>
+</dialog>
+
 <dialog id="memberDlg" aria-labelledby="memberDlgTitle">
   <div class="md-head">
     <h2 id="memberDlgTitle">💎 Member access</h2>
@@ -992,8 +1018,8 @@ footer{border-top:1px solid var(--line)}
           (details ? '<details class="jd"><summary><span class="jd-show">View job description</span><span class="jd-hide">Hide job description</span></summary>' + details + '</details>' : '') +
           '<div class="job-actions">' + (member
             ? (applied.indexOf(j.id) !== -1
-                ? '<button type="button" class="btn btn-applied" disabled>✓ Applied</button>'
-                : '<button type="button" class="btn btn-red" data-qapply="' + esc(j.id) + '">⚡ Apply in one click</button>')
+                ? '<button type="button" class="btn btn-applied" data-qapply="' + esc(j.id) + '">✓ Applied</button>'
+                : '<button type="button" class="btn btn-red" data-qapply="' + esc(j.id) + '">✉ Apply by email</button>')
             : '<button type="button" class="btn btn-red" data-apply="' + esc(j.id) + '">Apply now</button>') +
           '<button type="button" class="btn btn-outline" data-share="' + esc(j.id) + '">Copy job link</button></div></article>';
       }).join('');
@@ -1015,6 +1041,96 @@ footer{border-top:1px solid var(--line)}
       window.clearJobSelection(); form.elements.namedItem('role').value = ''; form.elements.namedItem('role').focus();
     });
 
+    // ----- Apply by email: opens Gmail with the recruiter, subject and the member's details filled in -----
+    function applyNote(btn, html, ok) {
+      var box = btn.closest('.job-actions'), n = box.querySelector('.apply-note');
+      if (!n) { n = document.createElement('p'); n.className = 'apply-note'; box.appendChild(n); }
+      n.className = 'apply-note' + (ok ? ' ok' : ''); n.innerHTML = html;
+    }
+    function jobSubject(j) {                     // "mention subject as '…'" in the job post → use it as is
+      var t = [j.howToApply, j.description, j.requirements, j.lookingFor, j.responsibilities].join('\n');
+      var m = t.match(/subject(?:\s*line)?\s*(?:as|:|-|–|should be|must be|to be|=)?\s*["“'‘]([^"”'’\n]{3,150})["”'’]/i) ||
+              t.match(/subject(?:\s*line)?\s*(?::|as|-|–|should be|must be)\s*([^\n]{3,150})/i);
+      return m ? m[1].replace(/[\s.;,]+$/, '').trim() : '';
+    }
+    function fillIn(text, p) {                   // replace [Your Name], <Name>, {Experience} … in a given subject
+      var exp = p.experience ? (EXP[p.experience] || p.experience) : '';
+      return text.replace(/[\[<{(]\s*(your\s+)?(full\s+)?name\s*[\]>})]/gi, p.name || '$&')
+        .replace(/[\[<{(]\s*(total\s+|your\s+)?(years\s+of\s+)?exp(erience)?\s*[\]>})]/gi, exp || '$&')
+        .replace(/[\[<{(]\s*(current\s+)?location\s*[\]>})]/gi, p.address || '$&')
+        .replace(/[\[<{(]\s*(job\s+)?(title|role|position)\s*[\]>})]/gi, '');
+    }
+    function draftEmail(j) {
+      var p = profile || {}, exp = p.experience ? (EXP[p.experience] || p.experience) : '', name = p.name || '';
+      var subject = jobSubject(j);
+      subject = subject ? fillIn(subject, p) : 'Application for ' + j.title + (name ? ' – ' + name : '') + (exp ? ' (' + exp + ')' : '');
+      var lines = [j.postedBy ? 'Dear ' + String(j.postedBy).split(/\s+/)[0] + ',' : 'Dear Hiring Team,', '',
+        'I am interested in the ' + j.title + ' position' + (j.company ? ' at ' + j.company : '') + '. Please find my resume attached and my details below.', ''];
+      [['Name', name], ['Email', p.email], ['Phone', p.phone], ['Current role', p.title], ['Total experience', exp],
+       ['Key skills', p.skills], ['Current location', p.address]].forEach(function (x) { if (x[1]) lines.push(x[0] + ': ' + x[1]); });
+      lines.push('', 'Looking forward to hearing from you.', '', 'Regards,', name, p.phone || '');
+      return { subject: subject, body: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim() };
+    }
+    var apDlg = document.getElementById('applyDlg'), apF = document.getElementById('applyForm'), apJob = null, apBtn = null;
+    function apNote(msg, ok) { var n = apF.querySelector('.md-note'); n.textContent = msg; n.className = 'md-note ' + (ok ? 'ok' : 'err'); }
+    function applyByEmail(j, m, btn) {
+      if (!j.applyEmail) {
+        var other = j.applyWhatsapp || j.contactPhone ? ' Please contact the recruiter using the WhatsApp / phone details shown above.' : (j.howToApply ? ' Please follow “How to apply” shown above.' : '');
+        applyNote(btn, '⚠️ <b>The recruiter email ID is not mentioned for this job.</b>' + esc(other));
+        return;
+      }
+      if (applied.indexOf(j.id) !== -1) { applyNote(btn, '✓ You have already applied for this job. The recruiter will reply to your email.', true); return; }
+      apJob = j; apBtn = btn;
+      var dr = draftEmail(j), p = profile || {};
+      apF.reset(); apNote('', true);
+      document.getElementById('applyJob').textContent = j.title + (j.company ? ' — ' + j.company : '');
+      apF.elements.namedItem('to').value = j.applyEmail;
+      apF.elements.namedItem('subject').value = dr.subject;
+      apF.elements.namedItem('body').value = dr.body;
+      var fileEl = document.getElementById('applyFile'), send = apF.querySelector('button[type=submit]');
+      if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Attached: ' + (p.resumeName || 'your resume'); send.disabled = false; }
+      else {
+        fileEl.className = 'ap-file missing';
+        fileEl.innerHTML = '📎 No resume yet — <button type="button" class="md-link" id="applyUpload">upload it in My account</button>, then apply again.';
+        send.disabled = true;
+      }
+      apDlg.showModal();
+    }
+    apDlg.addEventListener('click', function (e) {
+      if (e.target === apDlg || e.target.closest('[data-aclose]')) apDlg.close();
+      if (e.target.id === 'applyUpload') { apDlg.close(); openMember('account'); note(document.getElementById('accountForm'), 'Upload your resume here, then click ✉ Apply by email again.', false); }
+    });
+    document.getElementById('applyOwn').addEventListener('click', function () {
+      if (!apJob) return;
+      var su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value.replace('Please find my resume attached', 'Please find my resume attached (attach it before sending)');
+      var mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      var url = mobile
+        ? 'mailto:' + encodeURIComponent(apJob.applyEmail) + '?subject=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body)
+        : 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(apJob.applyEmail) + '&su=' + encodeURIComponent(su) + '&body=' + encodeURIComponent(body);
+      if (mobile) location.href = url; else window.open(url, '_blank', 'noopener');
+      apNote('Gmail opened in a new tab — attach your resume there and press Send.', true);
+    });
+    apF.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var m = getMember(), j = apJob; if (!m || !j) return;
+      var send = apF.querySelector('button[type=submit]');
+      send.disabled = true; send.textContent = 'Sending…'; apNote('', true);
+      post({ action: 'emailApply', token: m.token, jobId: j.id, subject: apF.elements.namedItem('subject').value, body: apF.elements.namedItem('body').value }).then(function (res) {
+        send.textContent = 'Send application';
+        if (res.ok || res.already) {
+          if (applied.indexOf(j.id) === -1) applied.push(j.id);
+          apDlg.close(); render();
+          var b2 = document.querySelector('#job-' + CSS.escape(j.id) + ' [data-qapply]');
+          if (b2) applyNote(b2, res.ok ? '✓ <b>Sent!</b> Your application and resume went to ' + esc(res.to || j.applyEmail) + '. A copy is in your email inbox.' : '✓ You have already applied for this job.', true);
+          return;
+        }
+        send.disabled = false;
+        if (res.sessionExpired) { apDlg.close(); setMember(null); window.reloadJobs(); openMember('login'); return; }
+        if (res.needResume) { apDlg.close(); openMember('account'); note(document.getElementById('accountForm'), res.error, false); return; }
+        apNote(res.error || 'Could not send — please try again.', false);
+      }).catch(function () { send.disabled = false; send.textContent = 'Send application'; apNote('Network error — please try again.', false); });
+    });
+
     listEl.addEventListener('click', function (e) {
       var a = e.target.closest('[data-apply]'), s = e.target.closest('[data-share]');
       if (e.target.id === 'jobReset') { e.preventDefault(); qEl.value = ''; whenEl.value = ''; locEl.value = ''; expEl.value = ''; chips = []; page = 1; buildFilters(); render(); return; }
@@ -1023,14 +1139,7 @@ footer{border-top:1px solid var(--line)}
       if (q) {
         var qj = jobs.find(function (x) { return x.id === q.dataset.qapply; }), m = getMember();
         if (!qj || !m) return;
-        if (!confirm('Apply for "' + qj.title + '"' + (qj.company ? ' at ' + qj.company : '') + ' with your profile and resume?')) return;
-        q.disabled = true; q.textContent = 'Applying…';
-        post({ action: 'quickApply', token: m.token, jobId: qj.id }).then(function (res) {
-          if (res.ok || res.already) { applied.push(qj.id); render(); return; }
-          if (res.sessionExpired) { setMember(null); window.reloadJobs(); openMember('login'); return; }
-          if (res.needResume) { render(); openMember('account'); note(document.getElementById('accountForm'), 'Upload your resume here first, then click ⚡ Apply again.', false); return; }
-          q.disabled = false; q.textContent = '⚡ Apply in one click'; alert(res.error || 'Could not apply');
-        }).catch(function () { q.disabled = false; q.textContent = '⚡ Apply in one click'; alert('Network error — please try again.'); });
+        applyByEmail(qj, m, q);
       }
       if (s) {
         var url = location.href.split('#')[0] + '#job-' + s.dataset.share, b = s;
