@@ -222,6 +222,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .ap-file{margin:0;font-size:14px;background:#F4FBF6;border:1px solid #CDE7D6;border-radius:8px;padding:10px 12px;color:#17663A}
 .ap-file.missing{background:#FFF6E5;border-color:#F1D9A6;color:#6B4B10}
 .ap-small{font-size:12.5px!important}
+.ap-save{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 14px;margin-top:-4px}
+#applyForm .ap-check{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--text);cursor:pointer}
+.ap-check input{width:18px;height:18px;margin:0;accent-color:var(--red)}
 .md-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px}
 .md-head h2{font-size:22px}
 .md-x{background:none;border:0;font-size:28px;line-height:1;cursor:pointer;color:var(--gray)}
@@ -666,6 +669,11 @@ footer{border-top:1px solid var(--line)}
     <label>To<input type="text" name="to" readonly></label>
     <label>Subject<input type="text" name="subject" required maxlength="200"></label>
     <label>Message <span class="md-hint">(edit anything you like)</span><textarea name="body" required rows="11"></textarea></label>
+    <div class="ap-save">
+      <label class="ap-check"><input type="checkbox" name="saveMsg"> Save this message for all my applications</label>
+      <button type="button" class="md-link" id="applyResetMsg" hidden>Use the standard message</button>
+    </div>
+    <p class="md-lead ap-small" id="applySavedNote" hidden>Using your saved message — the job title, company and greeting change automatically for each job.</p>
     <p class="ap-file" id="applyFile"></p>
     <button type="submit" class="btn btn-red" id="applyOwn">✉ Send from my email</button>
     <p class="md-lead ap-small" id="applyOwnHint">Opens your own email with everything filled in and your resume ready to attach. You press Send.</p>
@@ -1123,6 +1131,21 @@ footer{border-top:1px solid var(--line)}
       lines.push('', 'Looking forward to hearing from you.', '', 'Regards,', name, p.phone || '');
       return { subject: subject, body: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim() };
     }
+    // Saved message: stored with {job} / {company} / {greeting} so it fits every job
+    function toTemplate(text, j) {
+      var esc2 = function (x) { return String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+      var t = String(text).replace(/\r/g, '');
+      t = t.replace(/^(dear|hi|hello|hey|respected)\b[^\n]*\n/i, function (m, w) { return '{greeting:' + w + '}\n'; });
+      if (j.title) t = t.replace(new RegExp(esc2(j.title), 'gi'), '{job}');
+      if (j.company) t = t.replace(new RegExp(esc2(j.company), 'gi'), '{company}');
+      return t;
+    }
+    function fromTemplate(t, j) {
+      var hi = j.postedBy ? 'Dear ' + String(j.postedBy).split(/\s+/)[0] + ',' : 'Dear Hiring Team,';
+      if (!j.company) t = t.replace(/\s+(at|with|in|for)\s+\{company\}/gi, '');
+      t = t.replace(/\{greeting:([^}]+)\}/g, function (m, w) { return w + ' ' + (j.postedBy ? String(j.postedBy).split(/\s+/)[0] : 'Hiring Team') + ','; });
+      return t.replace(/\{greeting\}/g, hi).replace(/\{job\}/g, j.title || 'this').replace(/\{company\}/g, j.company || 'your company');
+    }
     var apDlg = document.getElementById('applyDlg'), apF = document.getElementById('applyForm'), apJob = null, apBtn = null;
     function apNote(msg, ok) { var n = apF.querySelector('.md-note'); n.textContent = msg; n.className = 'md-note ' + (ok ? 'ok' : 'err'); }
     function applyByEmail(j, m, btn) {
@@ -1138,7 +1161,11 @@ footer{border-top:1px solid var(--line)}
       document.getElementById('applyJob').textContent = j.title + (j.company ? ' — ' + j.company : '');
       apF.elements.namedItem('to').value = j.applyEmail;
       apF.elements.namedItem('subject').value = dr.subject;
-      apF.elements.namedItem('body').value = dr.body;
+      var saved = (profile && profile.savedMessage) || '';
+      apF.elements.namedItem('body').value = saved ? fromTemplate(saved, j) : dr.body;
+      apF.elements.namedItem('saveMsg').checked = false;
+      document.getElementById('applySavedNote').hidden = !saved;
+      document.getElementById('applyResetMsg').hidden = !saved;
       var fileEl = document.getElementById('applyFile'), send = apF.querySelector('button[type=submit]');
       var via = document.getElementById('applyVia');
       if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Attached: ' + (p.resumeName || 'resume'); via.disabled = false; prefetchResume(); loadGoogle(); }
@@ -1156,6 +1183,19 @@ footer{border-top:1px solid var(--line)}
         document.getElementById('applyOwnHint').textContent = 'Sends from your own Gmail with your resume attached. Google asks your permission the first time.';
       }
       apDlg.showModal();
+    }
+    document.getElementById('applyResetMsg').addEventListener('click', function () {
+      if (!apJob) return;
+      apF.elements.namedItem('body').value = draftEmail(apJob).body;
+      document.getElementById('applySavedNote').hidden = true;
+      apNote('Standard message restored. Tick “Save this message” to make it your default again.', true);
+    });
+    function saveMsgIfTicked() {
+      if (!apF.elements.namedItem('saveMsg').checked || !apJob) return;
+      var m = getMember(); if (!m) return;
+      var tpl = toTemplate(apF.elements.namedItem('body').value, apJob);
+      if (profile) profile.savedMessage = tpl;
+      post({ action: 'saveMessage', token: m.token, message: tpl }).catch(function () {});
     }
     apDlg.addEventListener('click', function (e) {
       if (e.target === apDlg || e.target.closest('[data-aclose]')) apDlg.close();
@@ -1265,6 +1305,7 @@ footer{border-top:1px solid var(--line)}
     apF.addEventListener('submit', function (e) {
       e.preventDefault();
       var j = apJob; if (!j) return;
+      saveMsgIfTicked();
       var to = j.applyEmail, su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value;
       var f = apFile;
       if (!f && profile && profile.hasResume) { apNote('Getting your resume ready… please click Send again in a moment.', true); prefetchResume(); return; }
@@ -1297,6 +1338,7 @@ footer{border-top:1px solid var(--line)}
     // Second button: BasMan sends it with the resume attached automatically
     document.getElementById('applyVia').addEventListener('click', function () {
       var m = getMember(), j = apJob; if (!m || !j) return;
+      saveMsgIfTicked();
       var send = this; send.disabled = true; var lbl = send.textContent; send.textContent = 'Sending…'; apNote('', true);
       post({ action: 'emailApply', token: m.token, jobId: j.id, subject: apF.elements.namedItem('subject').value, body: apF.elements.namedItem('body').value }).then(function (res) {
         send.disabled = false; send.textContent = lbl;
