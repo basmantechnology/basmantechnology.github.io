@@ -1035,6 +1035,7 @@ footer{border-top:1px solid var(--line)}
         if (j.salary) meta.push('<span>💰 ' + esc(j.salary) + '</span>');
         if (j.openings) meta.push('<span>👥 ' + esc(j.openings) + ' opening' + (j.openings === '1' ? '' : 's') + '</span>');
         if (j.domain) meta.push('<span>🏭 ' + esc(j.domain) + '</span>');
+        if (j.source) meta.push('<span>🔗 Via ' + esc(j.source) + '</span>');
         var must = [];
         if (j.mandatorySkill) must.push('<span>⭐ <b>Mandatory:</b> ' + esc(j.mandatorySkill) + '</span>');
         if (j.relevantExperience) must.push('<span>🔹 <b>Relevant experience:</b> ' + esc(j.relevantExperience) + '</span>');
@@ -1046,7 +1047,9 @@ footer{border-top:1px solid var(--line)}
         var tags = list(j.skills).map(function (s) { return '<span>' + esc(s) + '</span>'; }).join('');
         var fresh = Date.now() - j.posted < 3 * DAY;
         var contact = '';
-        if (member) {
+        if (j.sourceUrl) {
+          contact = '';   // external job: no HR details, apply on the source site
+        } else if (member) {
           var c = [];
           if (j.postedBy) c.push('<span>👤 ' + esc(j.postedBy) + '</span>');
           if (j.applyEmail) c.push('<span>📩 <a href="mailto:' + esc(j.applyEmail) + '?subject=' + encodeURIComponent('Application: ' + j.title) + '">' + esc(j.applyEmail) + '</a></span>');
@@ -1066,7 +1069,9 @@ footer{border-top:1px solid var(--line)}
           (tags ? '<div class="job-tags">' + tags + '</div>' : '') +
           contact +
           (details ? '<details class="jd"><summary><span class="jd-show">View job description</span><span class="jd-hide">Hide job description</span></summary>' + details + '</details>' : '') +
-          '<div class="job-actions">' + (member
+          '<div class="job-actions">' + (j.sourceUrl
+            ? '<a class="btn btn-red" href="' + esc(j.sourceUrl) + '" target="_blank" rel="noopener nofollow">Apply on ' + esc(j.source || 'source site') + ' ↗</a>'
+            : member
             ? (applied.indexOf(j.id) !== -1
                 ? '<button type="button" class="btn btn-applied" data-qapply="' + esc(j.id) + '">✓ Applied</button>'
                 : '<button type="button" class="btn btn-red" data-qapply="' + esc(j.id) + '">✉ Apply by email</button>')
