@@ -2,7 +2,7 @@
  * BasMan Technology — External Job Fetcher
  * -----------------------------------------
  * Add this as a NEW file (JobFetcher.gs) in the same Apps Script project as Code.gs.
- * It does not change Code.gs. It creates/uses these tabs in your sheet:
+ * It uses getSpreadsheet_() and saveJob_() from Code.gs. It creates/uses these tabs:
  *   • "Job Sources"   – what to search for (you fill this in)
  *   • "External Jobs" – fetched jobs waiting for your review
  *
@@ -21,7 +21,6 @@
 var FETCH = {
   SOURCES_TAB: 'Job Sources',
   EXTERNAL_TAB: 'External Jobs',
-  JOBS_TAB: 'Jobs',              // your existing Jobs tab (used only by publishApprovedExternal)
   FETCH_HOUR: 7,                 // runs daily at ~7:00, before your 8:00 daily tasks
   MAX_AGE_DAYS: 3,               // ignore jobs older than this
   PER_SEARCH: 20,                // max jobs per keyword/city per source
@@ -41,8 +40,8 @@ var EXTERNAL_HEADERS = ['Status', 'Source', 'Title', 'Company', 'Location', 'Sal
 
 /** Run once: creates the tabs and the daily 7:00 trigger. */
 function setupJobFetcher() {
-  getSourcesSheet_();
-  getExternalSheet_();
+  jfGetSourcesSheet_();
+  jfGetExternalSheet_();
   ScriptApp.getProjectTriggers().forEach(function (t) {
     if (t.getHandlerFunction() === 'fetchExternalJobs') ScriptApp.deleteTrigger(t);
   });
@@ -52,7 +51,7 @@ function setupJobFetcher() {
 
 /** Fetches new jobs from all sources and adds them to "External Jobs" with Status = New. */
 function fetchExternalJobs() {
-  var sources = readSources_();
+  var sources = jfReadSources_();
   var props = PropertiesService.getScriptProperties();
   var keys = {
     adzunaId: props.getProperty('ADZUNA_APP_ID'),
@@ -75,99 +74,74 @@ function fetchExternalJobs() {
 
   sources.searches.forEach(function (s) {
     var tag = ' [' + s.keyword + (s.city ? ' / ' + s.city : '') + ']';
-    if (keys.adzunaId && keys.adzunaKey) run('Adzuna' + tag, function () { return fetchAdzuna_(s, keys); });
-    if (keys.jooble) run('Jooble' + tag, function () { return fetchJooble_(s, keys); });
-    if (keys.careerjet) run('Careerjet' + tag, function () { return fetchCareerjet_(s, keys); });
+    if (keys.adzunaId && keys.adzunaKey) run('Adzuna' + tag, function () { return jfFetchAdzuna_(s, keys); });
+    if (keys.jooble) run('Jooble' + tag, function () { return jfFetchJooble_(s, keys); });
+    if (keys.careerjet) run('Careerjet' + tag, function () { return jfFetchCareerjet_(s, keys); });
   });
 
   var cityWords = sources.searches.map(function (s) { return (s.city || '').toLowerCase(); })
     .filter(String);
   sources.greenhouse.forEach(function (c) {
-    run('Greenhouse [' + c + ']', function () { return fetchGreenhouse_(c, cityWords); });
+    run('Greenhouse [' + c + ']', function () { return jfFetchGreenhouse_(c, cityWords); });
   });
   sources.lever.forEach(function (c) {
-    run('Lever [' + c + ']', function () { return fetchLever_(c, cityWords); });
+    run('Lever [' + c + ']', function () { return jfFetchLever_(c, cityWords); });
   });
 
   if (sources.remote.length) {
     sources.remote.forEach(function (k) {
-      run('Remotive [' + k + ']', function () { return fetchRemotive_(k); });
+      run('Remotive [' + k + ']', function () { return jfFetchRemotive_(k); });
     });
-    run('RemoteOK', function () { return fetchRemoteOK_(sources.remote); });
+    run('RemoteOK', function () { return jfFetchRemoteOK_(sources.remote); });
   }
 
-  var added = saveNewJobs_(found);
+  var added = jfSaveNewJobs_(found);
   var summary = 'Fetched ' + found.length + ', added ' + added + ' new.\n' + log.join('\n');
   Logger.log(summary);
   return summary;
 }
 
 /**
- * Copies rows you marked "Approve" in "External Jobs" into your Jobs tab, matching columns
- * by header name. Unmatched columns are left blank. Approved rows become "Published".
+ * Posts every row you marked "Approve" in "External Jobs" to your website, using the normal
+ * saveJob_() from Code.gs (same job IDs, cleaning and 30-day auto-close as your other jobs).
+ * External jobs are marked "Posted by = External: <source>" and the apply link goes in
+ * "How to apply", so the website shows an "Apply on <source>" button instead of HR details.
  */
 function publishApprovedExternal() {
-  var ext = getExternalSheet_();
-  var jobsSheet = SpreadsheetApp.getActive().getSheetByName(FETCH.JOBS_TAB);
-  if (!jobsSheet) throw new Error('Tab "' + FETCH.JOBS_TAB + '" not found.');
-
-  var jobHeaders = jobsSheet.getRange(1, 1, 1, jobsSheet.getLastColumn()).getValues()[0]
-    .map(function (h) { return String(h).trim().toLowerCase(); });
-  var synonyms = {
-    id: ['id', 'job id'],
-    title: ['title', 'job title', 'role', 'position', 'designation'],
-    company: ['company', 'company name', 'employer'],
-    location: ['location', 'city', 'job location'],
-    salary: ['salary', 'ctc', 'package', 'pay'],
-    type: ['type', 'job type', 'employment type'],
-    description: ['description', 'job description', 'details', 'jd'],
-    apply: ['apply link', 'apply url', 'link', 'url', 'apply', 'how to apply'],
-    source: ['source'],
-    posted: ['posted', 'posted on', 'date', 'created', 'created at'],
-    status: ['status']
-  };
-  function col(field) {
-    var list = synonyms[field];
-    for (var i = 0; i < list.length; i++) {
-      var idx = jobHeaders.indexOf(list[i]);
-      if (idx !== -1) return idx;
-    }
-    return -1;
-  }
-
+  var ext = jfGetExternalSheet_();
   var data = ext.getDataRange().getValues();
-  var h = data[0];
   var c = {};
-  h.forEach(function (name, i) { c[name] = i; });
-  var published = 0;
+  data[0].forEach(function (name, i) { c[name] = i; });
+  var published = 0, errors = [];
 
   for (var r = 1; r < data.length; r++) {
     var row = data[r];
     if (String(row[c['Status']]).trim().toLowerCase() !== 'approve') continue;
-    var out = new Array(jobHeaders.length).fill('');
-    var put = function (field, value) { var i = col(field); if (i !== -1) out[i] = value; };
-    put('id', 'EXT-' + shortHash_(row[c['Job Key']]));
-    put('title', row[c['Title']]);
-    put('company', row[c['Company']]);
-    put('location', row[c['Location']]);
-    put('salary', row[c['Salary']]);
-    put('type', row[c['Job Type']]);
-    put('description', row[c['Description']] + '\n\nSource: ' + row[c['Source']]);
-    put('apply', row[c['Apply Link']]);
-    put('source', row[c['Source']]);
-    put('posted', new Date());
-    put('status', 'Open');
-    jobsSheet.appendRow(out);
-    ext.getRange(r + 1, c['Status'] + 1).setValue('Published');
-    published++;
+    var res = saveJob_({
+      title: row[c['Title']],
+      company: row[c['Company']],
+      location: row[c['Location']],
+      salary: row[c['Salary']],
+      type: row[c['Job Type']],
+      description: row[c['Description']],
+      postedBy: 'External: ' + row[c['Source']],
+      howToApply: row[c['Apply Link']]
+    });
+    if (res.ok) {
+      ext.getRange(r + 1, c['Status'] + 1).setValue('Published');
+      published++;
+    } else {
+      errors.push('Row ' + (r + 1) + ': ' + res.error);
+    }
   }
-  Logger.log('Published ' + published + ' job(s) to ' + FETCH.JOBS_TAB + '.');
-  return published;
+  var msg = 'Published ' + published + ' job(s).' + (errors.length ? '\n' + errors.join('\n') : '');
+  Logger.log(msg);
+  return msg;
 }
 
 // ===================== SOURCES =====================
 
-function fetchAdzuna_(s, keys) {
+function jfFetchAdzuna_(s, keys) {
   var url = 'https://api.adzuna.com/v1/api/jobs/' + FETCH.ADZUNA_COUNTRY + '/search/1' +
     '?app_id=' + encodeURIComponent(keys.adzunaId) +
     '&app_key=' + encodeURIComponent(keys.adzunaKey) +
@@ -176,31 +150,31 @@ function fetchAdzuna_(s, keys) {
     (s.city ? '&where=' + encodeURIComponent(s.city) : '') +
     '&max_days_old=' + FETCH.MAX_AGE_DAYS +
     '&sort_by=date&content-type=application/json';
-  var json = getJson_(url);
+  var json = jfGetJson_(url);
   return (json.results || []).map(function (j) {
-    return job_('Adzuna', j.id, j.title, j.company && j.company.display_name,
+    return jfJob_('Adzuna', j.id, j.title, j.company && j.company.display_name,
       j.location && j.location.display_name,
-      salaryText_(j.salary_min, j.salary_max, 'INR', 'year'),
+      jfSalaryText_(j.salary_min, j.salary_max, 'INR', 'year'),
       [j.contract_type, j.contract_time].filter(Boolean).join(', '),
       j.created, j.description, j.redirect_url);
   });
 }
 
-function fetchJooble_(s, keys) {
+function jfFetchJooble_(s, keys) {
   var res = UrlFetchApp.fetch('https://' + FETCH.JOOBLE_HOST + '/api/' + encodeURIComponent(keys.jooble), {
     method: 'post',
     contentType: 'application/json',
     payload: JSON.stringify({ keywords: s.keyword, location: s.city || '', page: '1' }),
     muteHttpExceptions: true
   });
-  var json = parseResponse_(res);
+  var json = jfParseResponse_(res);
   return (json.jobs || []).slice(0, FETCH.PER_SEARCH).map(function (j) {
-    return job_('Jooble', j.id, j.title, j.company, j.location, j.salary, j.type,
+    return jfJob_('Jooble', j.id, j.title, j.company, j.location, j.salary, j.type,
       j.updated, j.snippet, j.link);
   });
 }
 
-function fetchCareerjet_(s, keys) {
+function jfFetchCareerjet_(s, keys) {
   // Careerjet requires user_ip and user_agent. This is a server-side daily fetch with no
   // end user, so we send your script's identity. Check Careerjet's terms for batch use.
   var url = 'https://search.api.careerjet.net/v4/query' +
@@ -213,51 +187,51 @@ function fetchCareerjet_(s, keys) {
     headers: { Authorization: 'Basic ' + Utilities.base64Encode(keys.careerjet + ':') },
     muteHttpExceptions: true
   });
-  var json = parseResponse_(res);
+  var json = jfParseResponse_(res);
   return (json.jobs || []).map(function (j) {
-    var salary = j.salary || salaryText_(j.salary_min, j.salary_max, j.salary_currency_code,
+    var salary = j.salary || jfSalaryText_(j.salary_min, j.salary_max, j.salary_currency_code,
       { Y: 'year', M: 'month', W: 'week', D: 'day', H: 'hour' }[j.salary_type] || '');
-    return job_('Careerjet', j.url, j.title, j.company, j.locations, salary, '',
+    return jfJob_('Careerjet', j.url, j.title, j.company, j.locations, salary, '',
       j.date, j.description, j.url);
   });
 }
 
-function fetchGreenhouse_(company, cityWords) {
-  var json = getJson_('https://boards-api.greenhouse.io/v1/boards/' +
+function jfFetchGreenhouse_(company, cityWords) {
+  var json = jfGetJson_('https://boards-api.greenhouse.io/v1/boards/' +
     encodeURIComponent(company) + '/jobs?content=true');
   return (json.jobs || [])
-    .filter(function (j) { return locationOk_(j.location && j.location.name, cityWords); })
+    .filter(function (j) { return jfLocationOk_(j.location && j.location.name, cityWords); })
     .map(function (j) {
-      return job_('Greenhouse', company + '-' + j.id, j.title, companyName_(company),
+      return jfJob_('Greenhouse', company + '-' + j.id, j.title, jfCompanyName_(company),
         j.location && j.location.name, '', '', j.updated_at, j.content, j.absolute_url);
     });
 }
 
-function fetchLever_(company, cityWords) {
-  var json = getJson_('https://api.lever.co/v0/postings/' + encodeURIComponent(company) + '?mode=json');
+function jfFetchLever_(company, cityWords) {
+  var json = jfGetJson_('https://api.lever.co/v0/postings/' + encodeURIComponent(company) + '?mode=json');
   return (Array.isArray(json) ? json : [])
-    .filter(function (j) { return locationOk_(j.categories && j.categories.location, cityWords); })
+    .filter(function (j) { return jfLocationOk_(j.categories && j.categories.location, cityWords); })
     .map(function (j) {
-      return job_('Lever', company + '-' + j.id, j.text, companyName_(company),
+      return jfJob_('Lever', company + '-' + j.id, j.text, jfCompanyName_(company),
         j.categories && j.categories.location, '', j.categories && j.categories.commitment,
         j.createdAt, j.descriptionPlain || j.description, j.hostedUrl);
     });
 }
 
-function fetchRemotive_(keyword) {
+function jfFetchRemotive_(keyword) {
   // Remotive asks that you don't call the API too often and link back to them.
-  var json = getJson_('https://remotive.com/api/remote-jobs?limit=' + FETCH.PER_SEARCH +
+  var json = jfGetJson_('https://remotive.com/api/remote-jobs?limit=' + FETCH.PER_SEARCH +
     '&search=' + encodeURIComponent(keyword));
   return (json.jobs || []).map(function (j) {
-    return job_('Remotive', j.id, j.title, j.company_name,
+    return jfJob_('Remotive', j.id, j.title, j.company_name,
       'Remote' + (j.candidate_required_location ? ' (' + j.candidate_required_location + ')' : ''),
       j.salary, j.job_type, j.publication_date, j.description, j.url);
   });
 }
 
-function fetchRemoteOK_(keywords) {
+function jfFetchRemoteOK_(keywords) {
   // RemoteOK requires a link back and mentioning Remote OK as the source.
-  var json = getJson_('https://remoteok.com/api');
+  var json = jfGetJson_('https://remoteok.com/api');
   var words = keywords.map(function (k) { return k.toLowerCase(); });
   return (Array.isArray(json) ? json : [])
     .filter(function (j) { return j && j.id && j.position; })   // first item is a legal notice
@@ -267,17 +241,17 @@ function fetchRemoteOK_(keywords) {
     })
     .slice(0, FETCH.PER_SEARCH)
     .map(function (j) {
-      return job_('RemoteOK', j.id, j.position, j.company,
+      return jfJob_('RemoteOK', j.id, j.position, j.company,
         'Remote' + (j.location ? ' (' + j.location + ')' : ''),
-        salaryText_(j.salary_min, j.salary_max, 'USD', 'year'), '',
+        jfSalaryText_(j.salary_min, j.salary_max, 'USD', 'year'), '',
         j.date, j.description, j.url);
     });
 }
 
 // ===================== SHEETS =====================
 
-function getSourcesSheet_() {
-  var ss = SpreadsheetApp.getActive();
+function jfGetSourcesSheet_() {
+  var ss = getSpreadsheet_();
   var sh = ss.getSheetByName(FETCH.SOURCES_TAB);
   if (!sh) {
     sh = ss.insertSheet(FETCH.SOURCES_TAB);
@@ -296,8 +270,8 @@ function getSourcesSheet_() {
   return sh;
 }
 
-function getExternalSheet_() {
-  var ss = SpreadsheetApp.getActive();
+function jfGetExternalSheet_() {
+  var ss = getSpreadsheet_();
   var sh = ss.getSheetByName(FETCH.EXTERNAL_TAB);
   if (!sh) {
     sh = ss.insertSheet(FETCH.EXTERNAL_TAB);
@@ -310,8 +284,8 @@ function getExternalSheet_() {
   return sh;
 }
 
-function readSources_() {
-  var rows = getSourcesSheet_().getDataRange().getValues().slice(1);
+function jfReadSources_() {
+  var rows = jfGetSourcesSheet_().getDataRange().getValues().slice(1);
   var out = { searches: [], greenhouse: [], lever: [], remote: [] };
   rows.forEach(function (r) {
     var type = String(r[0]).trim().toLowerCase();
@@ -326,15 +300,15 @@ function readSources_() {
   return out;
 }
 
-function saveNewJobs_(jobs) {
-  var sh = getExternalSheet_();
+function jfSaveNewJobs_(jobs) {
+  var sh = jfGetExternalSheet_();
   var existing = sh.getLastRow() > 1
     ? sh.getRange(2, 1, sh.getLastRow() - 1, EXTERNAL_HEADERS.length).getValues() : [];
   var seenKeys = {};
   var seenTitleCo = {};
   existing.forEach(function (r) {
     seenKeys[r[10]] = true;
-    seenTitleCo[dupKey_(r[2], r[3])] = true;
+    seenTitleCo[jfDupKey_(r[2], r[3])] = true;
   });
 
   var cutoff = Date.now() - FETCH.MAX_AGE_DAYS * 86400000;
@@ -343,7 +317,7 @@ function saveNewJobs_(jobs) {
   jobs.forEach(function (j) {
     if (!j.title || !j.link) return;
     if (j.posted && j.posted.getTime() < cutoff) return;
-    var tc = dupKey_(j.title, j.company);
+    var tc = jfDupKey_(j.title, j.company);
     if (seenKeys[j.key] || seenTitleCo[tc]) return;   // same job from another source = skip
     seenKeys[j.key] = true;
     seenTitleCo[tc] = true;
@@ -358,28 +332,28 @@ function saveNewJobs_(jobs) {
 
 // ===================== HELPERS =====================
 
-function job_(source, id, title, company, location, salary, type, posted, description, link) {
+function jfJob_(source, id, title, company, location, salary, type, posted, description, link) {
   var d = posted ? new Date(posted) : null;
   if (d && isNaN(d.getTime())) d = null;
   return {
     source: source,
     key: source + ':' + String(id || link),
-    title: clean_(title),
-    company: clean_(company),
-    location: clean_(location),
-    salary: clean_(salary),
-    type: clean_(type),
+    title: jfClean_(title),
+    company: jfClean_(company),
+    location: jfClean_(location),
+    salary: jfClean_(salary),
+    type: jfClean_(type),
     posted: d,
-    description: clean_(description).slice(0, FETCH.DESCRIPTION_CHARS),
+    description: jfClean_(description).slice(0, FETCH.DESCRIPTION_CHARS),
     link: String(link || '')
   };
 }
 
-function getJson_(url) {
-  return parseResponse_(UrlFetchApp.fetch(url, { muteHttpExceptions: true }));
+function jfGetJson_(url) {
+  return jfParseResponse_(UrlFetchApp.fetch(url, { muteHttpExceptions: true }));
 }
 
-function parseResponse_(res) {
+function jfParseResponse_(res) {
   var code = res.getResponseCode();
   if (code < 200 || code >= 300) {
     throw new Error('HTTP ' + code + ': ' + res.getContentText().slice(0, 150));
@@ -387,7 +361,7 @@ function parseResponse_(res) {
   return JSON.parse(res.getContentText());
 }
 
-function clean_(text) {
+function jfClean_(text) {
   if (text === null || text === undefined) return '';
   return String(text)
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
@@ -400,29 +374,29 @@ function clean_(text) {
     .trim();
 }
 
-function salaryText_(min, max, currency, period) {
+function jfSalaryText_(min, max, currency, period) {
   if (!min && !max) return '';
   var f = function (n) { return Math.round(Number(n)).toLocaleString('en-IN'); };
   var range = min && max && min !== max ? f(min) + ' – ' + f(max) : f(min || max);
   return (currency ? currency + ' ' : '') + range + (period ? ' / ' + period : '');
 }
 
-function locationOk_(location, cityWords) {
+function jfLocationOk_(location, cityWords) {
   var filter = FETCH.COMPANY_LOCATION_FILTER.concat(cityWords || []);
   if (!FETCH.COMPANY_LOCATION_FILTER.length) return true;
   var loc = String(location || '').toLowerCase();
   return filter.some(function (w) { return w && loc.indexOf(w) !== -1; });
 }
 
-function companyName_(slug) {
+function jfCompanyName_(slug) {
   return String(slug).replace(/[-_]+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
 }
 
-function dupKey_(title, company) {
+function jfDupKey_(title, company) {
   return (String(title) + '|' + String(company)).toLowerCase().replace(/[^a-z0-9|]/g, '');
 }
 
-function shortHash_(text) {
+function jfShortHash_(text) {
   var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, String(text));
   return bytes.slice(0, 5).map(function (b) { return ((b + 256) % 256).toString(16); }).join('');
 }
