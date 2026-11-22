@@ -138,7 +138,28 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
 .jobs-bar input{flex:1 1 260px;min-width:0}
 .jobs-bar select{flex:0 0 190px}
 .jobs-bar input:focus,.jobs-bar select:focus{outline:2px solid var(--red);outline-offset:1px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chips:empty{display:none}
+.msel{position:relative;flex:0 0 210px}
+.msel-btn{width:100%;font:inherit;font-size:15px;text-align:left;border:1px solid #CFC8C5;border-radius:8px;padding:10px 34px 10px 12px;background:#fff;color:var(--text);min-height:44px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23555' stroke-width='1.6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.msel-btn.on{border-color:var(--red);color:var(--red);font-weight:600}
+.msel-btn:focus{outline:2px solid var(--red);outline-offset:1px}
+.msel-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:min(320px,92vw);background:#fff;border:1px solid #D9D2CF;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.16);padding:10px}
+.msel-panel input{width:100%;font-size:15px;padding:9px 11px;border:1px solid #CFC8C5;border-radius:8px;margin-bottom:6px}
+.msel-list{max-height:280px;overflow:auto;display:grid;gap:1px}
+.msel-list label{display:flex;flex-direction:row;align-items:center;gap:10px;font-weight:500;color:var(--text);padding:8px 6px;border-radius:6px;cursor:pointer;font-size:14.5px}
+.msel-list label:hover{background:#F6F4F3}
+.msel-list label[hidden]{display:none}
+.msel-list input:focus{outline:none}
+.msel-list label:focus-within{background:#F6F4F3;box-shadow:inset 0 0 0 2px var(--red)}
+.msel-list input{width:18px;height:18px;margin:0;accent-color:var(--red);flex:none}
+.msel-list .n{margin-left:auto;color:var(--muted);font-size:12.5px}
+.msel-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #EEE9E7;margin-top:6px;padding-top:8px}
+.msel-foot .btn{padding:8px 18px;min-height:0;font-size:14px}
+.sel-tag{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13.5px;font-weight:600;border:0;background:var(--red);color:#fff;border-radius:999px;padding:6px 12px;cursor:pointer}
+.sel-tag span{font-size:15px;line-height:1;opacity:.85}
+.sel-clear{font:inherit;font-size:13.5px;background:none;border:0;color:var(--red);text-decoration:underline;cursor:pointer;padding:6px 4px}
 .chip{font:inherit;font-size:13.5px;font-weight:500;border:1px solid #D9D2CF;background:#fff;color:var(--gray);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:36px}
 .chip:hover{border-color:var(--gray)}
 .chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
@@ -252,7 +273,10 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--red);outline-off
   input,textarea,select{font-size:16px} /* stops iPhone zooming into fields */
   .foot{flex-direction:column;align-items:flex-start}
   .wa-float{right:14px;bottom:14px;width:52px;height:52px}
-  .jobs-bar select{flex:1 1 45%}
+  .jobs-bar select,.msel{flex:1 1 45%}
+  .jobs-bar{position:relative}
+  .msel{position:static}
+  .msel-panel{left:0;right:0;width:auto}
   .member-bar{justify-content:flex-start;width:100%}
   .member-bar .btn{flex:1 1 auto}
   #memberDlg{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0}
@@ -525,8 +549,16 @@ footer{border-top:1px solid var(--line)}
         <option value="15+">15+ yrs</option>
       </select>
       <select id="jobLoc" aria-label="Location"><option value="">All locations</option></select>
+      <div class="msel" id="skillSel">
+        <button type="button" class="msel-btn" id="skillBtn" aria-haspopup="true" aria-expanded="false">All skills</button>
+        <div class="msel-panel" id="skillPanel" hidden>
+          <input type="search" id="skillFind" placeholder="Find a skill…" aria-label="Find a skill">
+          <div class="msel-list" id="skillList" role="group" aria-label="Skills"></div>
+          <div class="msel-foot"><button type="button" class="md-link" id="skillClear">Clear</button><button type="button" class="btn btn-red" id="skillDone">Done</button></div>
+        </div>
+      </div>
     </div>
-    <div class="chips" id="jobChips" role="group" aria-label="Filter by skill"></div>
+    <div class="chips" id="jobChips" aria-label="Selected skills"></div>
     <p class="job-count" id="jobCount" aria-live="polite"></p>
     <div class="job-list" id="jobList"><div class="jobs-empty">Loading jobs…</div></div>
     <nav class="pager" id="jobPager" aria-label="Job pages" hidden></nav>
@@ -608,6 +640,7 @@ footer{border-top:1px solid var(--line)}
     </a>
     <nav aria-label="Social">
       <a href="https://wa.me/96565861821" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="privacy.html">Privacy</a>
       <a href="#">LinkedIn</a>
       <a href="#">YouTube</a>
       <a href="#">GitHub</a>
@@ -718,6 +751,9 @@ footer{border-top:1px solid var(--line)}
   var CALLMEBOT_APIKEY = 'PASTE_YOUR_APIKEY_HERE';
   // 3) Careers resumes are saved to your Google Drive + Google Sheet (see README-RESUMES.md).
   //    Paste your Apps Script Web app URL (ends with /exec) between the quotes:
+  // Google sign-in for "Send from my Gmail" (resume attached automatically). Paste your OAuth Client ID here.
+  // Leave it empty and the button falls back to: open Gmail + download the resume to attach.
+  var GOOGLE_CLIENT_ID = '';
   var CAREERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-J4VC0fta-YFVQHNEKdZ1qeFh6dCQSWbC0RKrqV78qjCKkxmGuUF9jyruXVSvZ60/exec';
   // ====================
 
@@ -863,6 +899,8 @@ footer{border-top:1px solid var(--line)}
   // ----- Jobs board: open jobs from your Google Sheet (newest first) -----
   (function () {
     var listEl = document.getElementById('jobList'), chipsEl = document.getElementById('jobChips');
+    var skillBtn = document.getElementById('skillBtn'), skillPanel = document.getElementById('skillPanel'),
+        skillList = document.getElementById('skillList'), skillFind = document.getElementById('skillFind');
     var qEl = document.getElementById('jobQ'), whenEl = document.getElementById('jobWhen'), locEl = document.getElementById('jobLoc');
     var countEl = document.getElementById('jobCount'), form = document.getElementById('careersForm');
     var expEl = document.getElementById('jobExp'), pagerEl = document.getElementById('jobPager');
@@ -918,11 +956,14 @@ footer{border-top:1px solid var(--line)}
         if (j.workMode === 'Remote') locs.Remote = 1;
       });
       var tags = Object.keys(count).map(function (k) { return count[k]; })
-        .sort(function (a, b) { return (b.cat - a.cat) || (b.n - a.n) || a.label.localeCompare(b.label); }).slice(0, 14);
+        .sort(function (a, b) { return (b.cat - a.cat) || (b.n - a.n) || a.label.localeCompare(b.label); });
       var on = chips.map(function (c) { return c.toLowerCase(); });
-      chipsEl.innerHTML = '<button type="button" class="chip" data-chip="" aria-pressed="' + (!chips.length) + '">All</button>' +
-        tags.map(function (t) { return '<button type="button" class="chip" data-chip="' + esc(t.label) + '" aria-pressed="' + (on.indexOf(t.label.toLowerCase()) !== -1) + '">' + esc(t.label) + '</button>'; }).join('') +
-        '<span class="chips-hint">Tip: tap several skills to combine them</span>';
+      skillList.innerHTML = tags.map(function (t) {
+        return '<label><input type="checkbox" value="' + esc(t.label) + '"' + (on.indexOf(t.label.toLowerCase()) !== -1 ? ' checked' : '') + '> ' +
+          esc(t.label) + '<span class="n">' + t.n + '</span></label>';
+      }).join('') || '<p class="md-lead" style="padding:8px">No skills yet</p>';
+      skillFind.value = '';
+      showSelected();
       var cur = locEl.value;
       locEl.innerHTML = '<option value="">All locations</option>' + Object.keys(locs).sort().map(function (l) { return '<option>' + esc(l) + '</option>'; }).join('');
       locEl.value = cur;
@@ -1048,11 +1089,21 @@ footer{border-top:1px solid var(--line)}
       if (!n) { n = document.createElement('p'); n.className = 'apply-note'; box.appendChild(n); }
       n.className = 'apply-note' + (ok ? ' ok' : ''); n.innerHTML = html;
     }
-    function jobSubject(j) {                     // "mention subject as '…'" in the job post → use it as is
-      var t = [j.howToApply, j.description, j.requirements, j.lookingFor, j.responsibilities].join('\n');
-      var m = t.match(/subject(?:\s*line)?\s*(?:as|:|-|–|should be|must be|to be|=)?\s*["“'‘]([^"”'’\n]{3,150})["”'’]/i) ||
-              t.match(/subject(?:\s*line)?\s*(?::|as|-|–|should be|must be)\s*([^\n]{3,150})/i);
-      return m ? m[1].replace(/[\s.;,]+$/, '').trim() : '';
+    function jobSubject(j) {                     // a subject asked for in the job post → use it as is
+      var t = [j.howToApply, j.description, j.requirements, j.lookingFor, j.responsibilities, j.mandatorySkill].join('\n');
+      var Q = '["“”\'‘’]', pats = [
+        // subject: "…"  /  subject line as '…'  /  email subject should be "…"
+        new RegExp('subject(?:\\s*line)?\\s*(?:as|:|-|–|—|should be|must be|to be|=|is)?\\s*' + Q + '([^"“”\'‘’\\n]{3,150})' + Q, 'i'),
+        // mention "…" in the subject (line)
+        new RegExp(Q + '([^"“”\'‘’\\n]{3,150})' + Q + '\\s*(?:in|as)\\s*(?:the\\s*)?(?:email\\s*|mail\\s*)?subject', 'i'),
+        // Subject: … (to the end of the line)
+        /subject(?:\s*line)?\s*(?::|as|-|–|—|should be|must be)\s*([^\n]{3,150})/i
+      ];
+      for (var i = 0; i < pats.length; i++) {
+        var m = t.match(pats[i]);
+        if (m) return m[1].replace(/[\s.;,]+$/, '').replace(/^[\s:–—-]+/, '').trim();
+      }
+      return '';
     }
     function fillIn(text, p) {                   // replace [Your Name], <Name>, {Experience} … in a given subject
       var exp = p.experience ? (EXP[p.experience] || p.experience) : '';
@@ -1090,13 +1141,17 @@ footer{border-top:1px solid var(--line)}
       apF.elements.namedItem('body').value = dr.body;
       var fileEl = document.getElementById('applyFile'), send = apF.querySelector('button[type=submit]');
       var via = document.getElementById('applyVia');
-      if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Your resume: ' + (p.resumeName || 'resume'); via.disabled = false; prefetchResume(); }
+      if (p.hasResume) { fileEl.className = 'ap-file'; fileEl.textContent = '📎 Attached: ' + (p.resumeName || 'resume'); via.disabled = false; prefetchResume(); loadGoogle(); }
       else {
         fileEl.className = 'ap-file missing';
         fileEl.innerHTML = '📎 No resume saved — <button type="button" class="md-link" id="applyUpload">upload it in My account</button> so it can be attached.';
         via.disabled = true;
       }
       send.disabled = false;
+      if (GOOGLE_CLIENT_ID && p.hasResume) {
+        send.textContent = '✉ Send from my Gmail';
+        document.getElementById('applyOwnHint').textContent = 'Sends from your own Gmail with your resume attached. Google asks your permission the first time.';
+      }
       apDlg.showModal();
     }
     apDlg.addEventListener('click', function (e) {
@@ -1128,6 +1183,81 @@ footer{border-top:1px solid var(--line)}
       var b2 = document.querySelector('#job-' + CSS.escape(j.id) + ' [data-qapply]');
       if (b2) applyNote(b2, html, true);
     }
+    // ----- Send from the candidate's own Gmail through Google sign-in (works on phones and computers) -----
+    var gTok = null, gTokExp = 0, gClient = null;
+    function loadGoogle() {
+      if (!GOOGLE_CLIENT_ID || window.google && google.accounts || document.getElementById('gsiScript')) return;
+      var sc = document.createElement('script'); sc.id = 'gsiScript'; sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true;
+      document.head.appendChild(sc);
+    }
+    function b64(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function wrap76(x) { return x.replace(/.{1,76}/g, '$&\r\n'); }
+    function fileB64Of(f) {
+      return f.arrayBuffer().then(function (buf) {
+        var bytes = new Uint8Array(buf), bin = '', CH = 0x8000;
+        for (var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+        return btoa(bin);
+      });
+    }
+    function htmlOf(text) {
+      var t = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]]/g, function (u) { return '<a href="' + u.replace(/"/g, '&quot;') + '">' + u + '</a>'; });
+      return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#222">' +
+        t.split(/\n{2,}/).map(function (p) { return '<p style="margin:0 0 14px">' + p.replace(/\n/g, '<br>') + '</p>'; }).join('') + '</div>';
+    }
+    function buildMime(to, subject, body, f, data) {
+      var mix = 'mix_' + Date.now().toString(36), alt = 'alt_' + Math.random().toString(36).slice(2);
+      var safeName = f.name.replace(/["\r\n]/g, '');
+      var out = [
+        'To: ' + to, 'Subject: =?UTF-8?B?' + b64(subject) + '?=', 'MIME-Version: 1.0',
+        'Content-Type: multipart/mixed; boundary="' + mix + '"', '',
+        '--' + mix, 'Content-Type: multipart/alternative; boundary="' + alt + '"', '',
+        '--' + alt, 'Content-Type: text/plain; charset="UTF-8"', 'Content-Transfer-Encoding: base64', '', wrap76(b64(body)),
+        '--' + alt, 'Content-Type: text/html; charset="UTF-8"', 'Content-Transfer-Encoding: base64', '', wrap76(b64(htmlOf(body))),
+        '--' + alt + '--', '',
+        '--' + mix, 'Content-Type: ' + (f.type || 'application/octet-stream') + '; name="=?UTF-8?B?' + b64(safeName) + '?="',
+        'Content-Disposition: attachment; filename="=?UTF-8?B?' + b64(safeName) + '?="', 'Content-Transfer-Encoding: base64', '', wrap76(data),
+        '--' + mix + '--'
+      ].join('\r\n');
+      return btoa(out).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    function gmailSend(token, raw) {
+      return fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raw: raw })
+      }).then(function (r) { return r.json().then(function (x) { if (!r.ok) throw new Error(x.error && x.error.message || 'Gmail error ' + r.status); return x; }); });
+    }
+    function sendViaGmail(j, to, su, body, f, btn) {
+      var lbl = btn.textContent;
+      var go = function (token) {
+        btn.disabled = true; btn.textContent = 'Sending from your Gmail…'; apNote('', true);
+        fileB64Of(f).then(function (data) { return gmailSend(token, buildMime(to, su, body, f, data)); }).then(function () {
+          btn.disabled = false; btn.textContent = lbl;
+          recordApply(j);
+          appliedDone(j, '✓ <b>Sent from your Gmail!</b> Your application and resume went to ' + esc(to) + '. You can see it in your Gmail “Sent” folder.');
+        }).catch(function (err) {
+          btn.disabled = false; btn.textContent = lbl;
+          if (/invalid|expired|credential|401/i.test(err.message)) gTok = null;
+          apNote('Could not send from Gmail: ' + err.message + '. Try again, or let BasMan send it for you.', false);
+        });
+      };
+      if (gTok && Date.now() < gTokExp) { go(gTok); return; }
+      if (!gClient) {
+        gClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/gmail.send',
+          callback: function () {}, error_callback: function (e) {
+            apNote(e && e.type === 'popup_closed' ? 'Google sign-in was closed. Tap Send again when ready.' : 'Google sign-in did not work. You can let BasMan send it for you instead.', false);
+          }
+        });
+      }
+      gClient.callback = function (resp) {
+        if (!resp || resp.error || !resp.access_token) { apNote('Gmail permission was not given, so nothing was sent.', false); return; }
+        gTok = resp.access_token; gTokExp = Date.now() + (Number(resp.expires_in || 3600) - 120) * 1000;
+        go(gTok);
+      };
+      gClient.requestAccessToken({ prompt: '', hint: (profile && profile.email) || '' });
+    }
+
     // Main button: send from the candidate's OWN email
     apF.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -1135,6 +1265,9 @@ footer{border-top:1px solid var(--line)}
       var to = j.applyEmail, su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value;
       var f = apFile;
       if (!f && profile && profile.hasResume) { apNote('Getting your resume ready… please click Send again in a moment.', true); prefetchResume(); return; }
+      if (f && GOOGLE_CLIENT_ID && window.google && google.accounts && google.accounts.oauth2) {
+        sendViaGmail(j, to, su, body, f, document.getElementById('applyOwn')); return;
+      }
       // Phone: share sheet → choose Gmail → the resume is already attached
       if (apMobile && f && navigator.canShare && navigator.canShare({ files: [f] })) {
         try { navigator.clipboard && navigator.clipboard.writeText(to); } catch (x) {}
@@ -1189,15 +1322,39 @@ footer{border-top:1px solid var(--line)}
         else prompt('Copy this link:', url);
       }
     });
-    chipsEl.addEventListener('click', function (e) {
+    function showSelected() {                    // selected skills as red tags under the filters
+      skillBtn.textContent = !chips.length ? 'All skills' : chips.length === 1 ? chips[0] : chips.length + ' skills selected';
+      skillBtn.classList.toggle('on', !!chips.length);
+      chipsEl.innerHTML = chips.map(function (c) { return '<button type="button" class="sel-tag" data-chip="' + esc(c) + '" aria-label="Remove ' + esc(c) + '">' + esc(c) + ' <span>×</span></button>'; }).join('') +
+        (chips.length > 1 ? '<button type="button" class="sel-clear" data-chip="">Clear all</button>' : '');
+    }
+    function openSkills(open) {
+      skillPanel.hidden = !open; skillBtn.setAttribute('aria-expanded', String(open));
+      if (open && !/Mobi|Android/i.test(navigator.userAgent)) skillFind.focus();
+    }
+    skillBtn.addEventListener('click', function () { openSkills(skillPanel.hidden); });
+    document.getElementById('skillDone').addEventListener('click', function () { openSkills(false); });
+    document.getElementById('skillClear').addEventListener('click', function () {
+      chips = []; skillList.querySelectorAll('input').forEach(function (x) { x.checked = false; }); page = 1; showSelected(); render();
+    });
+    skillList.addEventListener('change', function (e) {
+      var v = e.target.value, at = chips.map(function (x) { return x.toLowerCase(); }).indexOf(v.toLowerCase());
+      if (e.target.checked && at === -1) chips.push(v); else if (!e.target.checked && at !== -1) chips.splice(at, 1);
+      page = 1; showSelected(); render();
+    });
+    skillFind.addEventListener('input', function () {
+      var q = skillFind.value.trim().toLowerCase();
+      skillList.querySelectorAll('label').forEach(function (l) { l.hidden = q && l.textContent.toLowerCase().indexOf(q) === -1; });
+    });
+    document.addEventListener('click', function (e) { if (!skillPanel.hidden && !e.target.closest('#skillSel')) openSkills(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !skillPanel.hidden) { openSkills(false); skillBtn.focus(); } });
+    chipsEl.addEventListener('click', function (e) {   // remove one tag, or "Clear all"
       var c = e.target.closest('[data-chip]'); if (!c) return;
-      var v = c.dataset.chip, at = chips.map(function (x) { return x.toLowerCase(); }).indexOf(v.toLowerCase());
-      if (!v) chips = [];                       // "All" clears every skill
-      else if (at === -1) chips.push(v); else chips.splice(at, 1);
+      var v = c.dataset.chip;
+      if (!v) chips = []; else chips = chips.filter(function (x) { return x.toLowerCase() !== v.toLowerCase(); });
       var on = chips.map(function (x) { return x.toLowerCase(); });
-      chipsEl.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.chip ? on.indexOf(b.dataset.chip.toLowerCase()) !== -1 : !chips.length)); });
-      page = 1;
-      render();
+      skillList.querySelectorAll('input').forEach(function (x) { x.checked = on.indexOf(x.value.toLowerCase()) !== -1; });
+      page = 1; showSelected(); render();
     });
     [qEl, whenEl, locEl, expEl].forEach(function (el) { el.addEventListener('input', function () { page = 1; render(); }); });
 
