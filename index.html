@@ -1148,7 +1148,10 @@ footer{border-top:1px solid var(--line)}
         via.disabled = true;
       }
       send.disabled = false;
-      if (GOOGLE_CLIENT_ID && p.hasResume) {
+      var inAppB = /FBAN|FBAV|Instagram|LinkedInApp|Line\/|Snapchat|; wv\)|\bwv\b/i.test(navigator.userAgent);
+      if (GOOGLE_CLIENT_ID && p.hasResume && inAppB) {
+        document.getElementById('applyOwnHint').innerHTML = 'Tip: for one-tap sending from Gmail with your resume attached, open this page in <b>Chrome or Safari</b> (tap ⋮ → “Open in browser”).';
+      } else if (GOOGLE_CLIENT_ID && p.hasResume) {
         send.textContent = '✉ Send from my Gmail';
         document.getElementById('applyOwnHint').textContent = 'Sends from your own Gmail with your resume attached. Google asks your permission the first time.';
       }
@@ -1265,7 +1268,10 @@ footer{border-top:1px solid var(--line)}
       var to = j.applyEmail, su = apF.elements.namedItem('subject').value, body = apF.elements.namedItem('body').value;
       var f = apFile;
       if (!f && profile && profile.hasResume) { apNote('Getting your resume ready… please click Send again in a moment.', true); prefetchResume(); return; }
-      if (f && GOOGLE_CLIENT_ID && window.google && google.accounts && google.accounts.oauth2) {
+      // Google blocks its sign-in inside app browsers (LinkedIn, Instagram, Facebook, Android web views) —
+      // there we skip it and use the phone's share menu / mail app instead.
+      var inApp = /FBAN|FBAV|Instagram|LinkedInApp|Line\/|Snapchat|; wv\)|\bwv\b/i.test(navigator.userAgent);
+      if (f && GOOGLE_CLIENT_ID && !inApp && window.google && google.accounts && google.accounts.oauth2) {
         sendViaGmail(j, to, su, body, f, document.getElementById('applyOwn')); return;
       }
       // Phone: share sheet → choose Gmail → the resume is already attached
