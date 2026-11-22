@@ -30,7 +30,12 @@ var FETCH = {
   ADZUNA_COUNTRY: 'in',          // Adzuna India
   // For company feeds (Greenhouse/Lever): keep only jobs whose location contains one of these
   // words, or one of your cities from the Job Sources tab. Set to [] to keep all locations.
-  COMPANY_LOCATION_FILTER: ['india', 'remote']
+  COMPANY_LOCATION_FILTER: ['india', 'remote'],
+  // Remote jobs: keep only those open to India. Jobs limited to other countries are skipped.
+  REMOTE_OK_WORDS: ['worldwide', 'anywhere', 'global', 'india', 'asia', 'apac', 'emea'],
+  // Words ignored when checking that a job really matches its search keyword
+  GENERIC_WORDS: ['developer', 'developers', 'engineer', 'tester', 'consultant', 'lead', 'senior',
+                  'junior', 'specialist', 'analyst', 'expert', 'jobs', 'job']
 };
 
 var EXTERNAL_HEADERS = ['Status', 'Source', 'Title', 'Company', 'Location', 'Salary',
@@ -62,9 +67,11 @@ function fetchExternalJobs() {
 
   var found = [];
   var log = [];
-  function run(label, fn) {
+  function run(label, fn, keyword, remoteOnly) {
     try {
-      var jobs = fn() || [];
+      var jobs = (fn() || []).filter(function (j) {
+        return (!keyword || jfRelevant_(j, keyword)) && (!remoteOnly || jfRemoteOk_(j.location));
+      });
       found = found.concat(jobs);
       log.push(label + ': ' + jobs.length);
     } catch (e) {
@@ -74,9 +81,9 @@ function fetchExternalJobs() {
 
   sources.searches.forEach(function (s) {
     var tag = ' [' + s.keyword + (s.city ? ' / ' + s.city : '') + ']';
-    if (keys.adzunaId && keys.adzunaKey) run('Adzuna' + tag, function () { return jfFetchAdzuna_(s, keys); });
-    if (keys.jooble) run('Jooble' + tag, function () { return jfFetchJooble_(s, keys); });
-    if (keys.careerjet) run('Careerjet' + tag, function () { return jfFetchCareerjet_(s, keys); });
+    if (keys.adzunaId && keys.adzunaKey) run('Adzuna' + tag, function () { return jfFetchAdzuna_(s, keys); }, s.keyword);
+    if (keys.jooble) run('Jooble' + tag, function () { return jfFetchJooble_(s, keys); }, s.keyword);
+    if (keys.careerjet) run('Careerjet' + tag, function () { return jfFetchCareerjet_(s, keys); }, s.keyword);
   });
 
   var cityWords = sources.searches.map(function (s) { return (s.city || '').toLowerCase(); })
@@ -90,9 +97,9 @@ function fetchExternalJobs() {
 
   if (sources.remote.length) {
     sources.remote.forEach(function (k) {
-      run('Remotive [' + k + ']', function () { return jfFetchRemotive_(k); });
+      run('Remotive [' + k + ']', function () { return jfFetchRemotive_(k); }, k, true);
     });
-    run('RemoteOK', function () { return jfFetchRemoteOK_(sources.remote); });
+    run('RemoteOK', function () { return jfFetchRemoteOK_(sources.remote); }, null, true);
   }
 
   var added = jfSaveNewJobs_(found);
@@ -358,7 +365,7 @@ function jfParseResponse_(res) {
   if (code < 200 || code >= 300) {
     throw new Error('HTTP ' + code + ': ' + res.getContentText().slice(0, 150));
   }
-  return JSON.parse(res.getContentText());
+  return JSON.parse(res.getContentText('UTF-8'));
 }
 
 function jfClean_(text) {
@@ -379,6 +386,24 @@ function jfSalaryText_(min, max, currency, period) {
   var f = function (n) { return Math.round(Number(n)).toLocaleString('en-IN'); };
   var range = min && max && min !== max ? f(min) + ' – ' + f(max) : f(min || max);
   return (currency ? currency + ' ' : '') + range + (period ? ' / ' + period : '');
+}
+
+// A job must mention the main words of its search keyword (title or description).
+// "Blue Prism developer" → needs "blue prism", so "Blue Yonder" jobs are skipped.
+function jfRelevant_(job, keyword) {
+  var core = String(keyword).toLowerCase().split(/\s+/).filter(function (w) {
+    return w && FETCH.GENERIC_WORDS.indexOf(w) === -1;
+  }).join(' ');
+  if (!core) return true;
+  var text = (job.title + ' ' + job.description).toLowerCase().replace(/\s+/g, ' ');
+  return text.indexOf(core) !== -1;
+}
+
+function jfRemoteOk_(location) {
+  var loc = String(location || '').toLowerCase();
+  var inner = (/\((.*)\)/.exec(loc) || [])[1];
+  if (!inner) return true;   // plain "Remote" with no country limit
+  return FETCH.REMOTE_OK_WORDS.some(function (w) { return inner.indexOf(w) !== -1; });
 }
 
 function jfLocationOk_(location, cityWords) {
