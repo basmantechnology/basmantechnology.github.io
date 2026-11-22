@@ -30,6 +30,8 @@ var FETCH = {
   ADZUNA_COUNTRY: 'in',          // Adzuna India
   // For company feeds (Greenhouse/Lever): keep only jobs whose location contains one of these
   // words, or one of your cities from the Job Sources tab. Set to [] to keep all locations.
+  // Only keep jobs whose description contains a recruiter email (so "Apply by email" works).
+  REQUIRE_EMAIL: true,
   COMPANY_LOCATION_FILTER: ['india', 'remote'],
   // Remote jobs: keep only those open to India. Jobs limited to other countries are skipped.
   REMOTE_OK_WORDS: ['worldwide', 'anywhere', 'global', 'india', 'asia', 'apac', 'emea'],
@@ -39,7 +41,7 @@ var FETCH = {
 };
 
 var EXTERNAL_HEADERS = ['Status', 'Source', 'Title', 'Company', 'Location', 'Salary',
-  'Job Type', 'Posted', 'Description', 'Apply Link', 'Job Key', 'Fetched At'];
+  'Job Type', 'Posted', 'Description', 'Apply Link', 'Job Key', 'Fetched At', 'Apply Email'];
 
 // ===================== MAIN =====================
 
@@ -124,15 +126,16 @@ function publishApprovedExternal() {
   for (var r = 1; r < data.length; r++) {
     var row = data[r];
     if (String(row[c['Status']]).trim().toLowerCase() !== 'approve') continue;
+    if (FETCH.REQUIRE_EMAIL && !row[c['Apply Email']]) { errors.push('Row ' + (r + 1) + ': no recruiter email, skipped'); continue; }
     var res = saveJob_({
       title: row[c['Title']],
       company: row[c['Company']],
       location: row[c['Location']],
       salary: row[c['Salary']],
       type: row[c['Job Type']],
-      description: row[c['Description']],
-      postedBy: 'External: ' + row[c['Source']],
-      howToApply: row[c['Apply Link']]
+      description: row[c['Description']] + '\n\nOriginal post (' + row[c['Source']] + '): ' + row[c['Apply Link']],
+      applyEmail: row[c['Apply Email']] || '',
+      postedBy: 'External: ' + row[c['Source']]
     });
     if (res.ok) {
       ext.getRange(r + 1, c['Status'] + 1).setValue('Published');
@@ -288,6 +291,9 @@ function jfGetExternalSheet_() {
       .requireValueInList(['New', 'Approve', 'Reject', 'Published'], true).build();
     sh.getRange('A2:A').setDataValidation(rule);
   }
+  if (sh.getRange(1, EXTERNAL_HEADERS.length).getValue() !== EXTERNAL_HEADERS[EXTERNAL_HEADERS.length - 1]) {
+    sh.getRange(1, 1, 1, EXTERNAL_HEADERS.length).setValues([EXTERNAL_HEADERS]).setFontWeight('bold');
+  }
   return sh;
 }
 
@@ -319,6 +325,7 @@ function jfSaveNewJobs_(jobs) {
   });
 
   var cutoff = Date.now() - FETCH.MAX_AGE_DAYS * 86400000;
+  var skippedNoEmail = 0;
   var now = new Date();
   var rows = [];
   jobs.forEach(function (j) {
@@ -326,14 +333,17 @@ function jfSaveNewJobs_(jobs) {
     if (j.posted && j.posted.getTime() < cutoff) return;
     var tc = jfDupKey_(j.title, j.company);
     if (seenKeys[j.key] || seenTitleCo[tc]) return;   // same job from another source = skip
+    var email = j.email;
+    if (FETCH.REQUIRE_EMAIL && !email) { skippedNoEmail++; return; }
     seenKeys[j.key] = true;
     seenTitleCo[tc] = true;
     rows.push(['New', j.source, j.title, j.company, j.location, j.salary, j.type,
-      j.posted || '', j.description, j.link, j.key, now]);
+      j.posted || '', j.description, j.link, j.key, now, email]);
   });
   if (rows.length) {
     sh.getRange(sh.getLastRow() + 1, 1, rows.length, EXTERNAL_HEADERS.length).setValues(rows);
   }
+  if (skippedNoEmail) Logger.log('Skipped ' + skippedNoEmail + ' job(s) with no recruiter email.');
   return rows.length;
 }
 
@@ -352,6 +362,7 @@ function jfJob_(source, id, title, company, location, salary, type, posted, desc
     type: jfClean_(type),
     posted: d,
     description: jfClean_(description).slice(0, FETCH.DESCRIPTION_CHARS),
+    email: jfFindEmail_(jfClean_(description)),   // searched in the full text, before trimming
     link: String(link || '')
   };
 }
@@ -390,6 +401,13 @@ function jfSalaryText_(min, max, currency, period) {
 
 // A job must mention the main words of its search keyword (title or description).
 // "Blue Prism developer" → needs "blue prism", so "Blue Yonder" jobs are skipped.
+function jfFindEmail_(text) {
+  var m = String(text || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+  if (!m) return '';
+  var e = m[0].replace(/\.+$/, '');
+  return /(noreply|no-reply|example\.com|jooble|remotive|remoteok)/i.test(e) ? '' : e;
+}
+
 function jfRelevant_(job, keyword) {
   var core = String(keyword).toLowerCase().split(/\s+/).filter(function (w) {
     return w && FETCH.GENERIC_WORDS.indexOf(w) === -1;
